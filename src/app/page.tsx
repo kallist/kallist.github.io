@@ -1,217 +1,308 @@
-/* eslint-disable @next/next/no-img-element -- local originals are served as-is by static export */
+/* eslint-disable @next/next/no-img-element -- supplied artwork is served unchanged by static export */
 import Link from "next/link";
 import { ProjectImage } from "@/components/project-image";
 import { projects } from "@/content/projects";
 
+const [repobound, cueparcel, agentStudio, skinLesion] = projects;
+
 const capabilities = [
   {
     name: "Context engineering",
-    proof: "RepoBound · CueParcel",
+    proof: "RepoBound / CueParcel",
     href: "/work/repobound/",
   },
   {
-    name: "Agent runtime & evidence",
+    name: "Agent runtime + evidence",
     proof: "Agent Studio",
     href: "/work/agent-studio/",
   },
   {
-    name: "Applied ML & evaluation",
-    proof: "Skin Lesion AI Platform",
+    name: "Applied ML + evaluation",
+    proof: "Skin Lesion AI",
     href: "/work/skin-lesion-ai/",
   },
   {
-    name: "Product & visual thinking",
-    proof: "CueParcel · visual practice",
+    name: "Product + visual thinking",
+    proof: "CueParcel / Visual practice",
     href: "/work/cueparcel/",
   },
 ];
 
 export default function Home() {
   return (
-    <main id="main">
-      <section className="hero shell" aria-labelledby="hero-title">
-        <div className="hero-topline">
-          <span>Portfolio / 2026</span>
-          <span>AI engineering · Context systems · Visual practice</span>
+    <main id="main" className="v11-home">
+      <section className="v11-hero shell" aria-labelledby="hero-title">
+        <div className="v11-hero-overline v11-micro">
+          <span>Independent practice / 2026</span>
+          <span>Engineering × Visual thinking</span>
         </div>
-        <div className="hero-grid">
-          <div className="hero-copy">
-            <p className="eyebrow">
-              Wei Zhuojie <span aria-hidden="true">/</span> 韦焯杰
+        <h1 id="hero-title" className="v11-hero-wordmark">
+          kallist<span aria-hidden="true">.</span>
+        </h1>
+        <div className="v11-hero-field">
+          <div className="v11-fragment-field" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+            <i />
+            <i />
+            <i />
+          </div>
+          <img
+            className="v11-hero-portrait"
+            src="/portrait/self-portrait.webp"
+            alt="Black and white hand-drawn manga self portrait for kallist, fragmented with diagonal ink strokes"
+            fetchPriority="high"
+            width="1448"
+            height="1086"
+          />
+          <div className="v11-hero-thesis">
+            <p className="v11-micro">
+              AI systems / Context engineering / Visual practice
             </p>
-            <h1 id="hero-title">
-              <span>Making AI</span>
-              <span className="serif-italic">systems</span>
-              <span>
-                inspectable<span className="title-period">.</span>
-              </span>
-            </h1>
-            <p className="hero-lede">
-              I build context tools and agent systems that people can inspect,
-              test and understand.
+            <p>
+              Make the system visible.
+              <br />
+              Make the evidence matter.
             </p>
-            <div className="hero-actions">
-              <Link className="button button-dark" href="#work">
-                Explore selected work <span aria-hidden="true">↗</span>
-              </Link>
-              <Link className="text-link" href="/resume/">
-                View resume <span aria-hidden="true">↗</span>
+          </div>
+          <div className="v11-hero-caption v11-micro">
+            <span>01 original drawing</span>
+            <span>Ink / digital fragments</span>
+          </div>
+        </div>
+        <div className="v11-hero-tail v11-micro">
+          <span>AI engineering · source-first practice</span>
+          <Link href="#work">
+            Selected work <span aria-hidden="true">↓</span>
+          </Link>
+        </div>
+      </section>
+
+      <section className="v11-work" id="work" aria-labelledby="work-title">
+        <div className="shell v11-chapter-intro">
+          <span className="v11-chapter-ghost" aria-hidden="true">
+            01
+          </span>
+          <p className="v11-micro">01 / Four systems, four boundaries</p>
+          <h2 id="work-title">
+            Selected
+            <br />
+            <em>work.</em>
+          </h2>
+          <p className="v11-chapter-aside">
+            Engineering decisions you can inspect, with source and limitations
+            one click away.
+          </p>
+        </div>
+
+        <article className="shell v11-feature v11-repobound">
+          <div className="v11-feature-rule v11-micro">
+            <span>01 / 04</span>
+            <span>{repobound.kicker}</span>
+          </div>
+          <h3>
+            RepoBound<span aria-hidden="true">↗</span>
+          </h3>
+          <div className="v11-repobound-layout">
+            <ProjectImage
+              src={repobound.image}
+              alt={repobound.imageAlt}
+              caption={repobound.imageCaption}
+            />
+            <div className="v11-feature-copy">
+              <p className="v11-feature-lead">{repobound.summary}</p>
+              <p>{repobound.problem}</p>
+              <Link className="v11-open-link" href={`/work/${repobound.slug}/`}>
+                Explore case study <span aria-hidden="true">↗</span>
               </Link>
             </div>
           </div>
-          <div className="hero-art">
-            {/* User supplied drawing; native image avoids server image processing in static export. */}
-            <img
-              src="/portrait/self-portrait.webp"
-              alt="Black and white hand-drawn manga self portrait by Wei Zhuojie with fragmented ink lines"
-              fetchPriority="high"
-              width="1448"
-              height="1086"
-            />
-            <span className="art-index" aria-hidden="true">
-              FIG. 001 / SELF PORTRAIT
-            </span>
-          </div>
-        </div>
-        <div className="hero-bottomline">
-          <span>South China Agricultural University · Class of 2027</span>
-          <span>Scroll to explore ↓</span>
-        </div>
-      </section>
+        </article>
 
-      <section
-        className="section shell work-section"
-        id="work"
-        aria-labelledby="work-title"
-      >
-        <div className="section-heading">
-          <p className="section-index">01 / SELECTED WORK</p>
-          <h2 id="work-title">
-            Systems with <em>receipts.</em>
-          </h2>
-          <p>
-            Four projects, each with a problem, an engineering decision and
-            evidence you can open.
-          </p>
-        </div>
-        <div className="project-list">
-          {projects.map((project, index) => (
-            <article
-              className={`project-feature project-feature-${index + 1}`}
-              key={project.slug}
-            >
-              <div className="project-feature-meta">
-                <span>{project.number} / 04</span>
-                <span>{project.kicker}</span>
-              </div>
-              <div className="project-feature-grid">
-                <div className="project-feature-copy">
-                  <h3>{project.title}</h3>
-                  <p className="project-summary">{project.summary}</p>
-                  <p className="project-context">{project.problem}</p>
-                  <div
-                    className="tag-list"
-                    aria-label={`${project.title} technologies`}
-                  >
-                    {project.stack.slice(0, 4).map((tag) => (
-                      <span key={tag}>{tag}</span>
-                    ))}
-                  </div>
-                  <Link
-                    className="project-link"
-                    href={`/work/${project.slug}/`}
-                  >
-                    Explore case study <span aria-hidden="true">↗</span>
-                  </Link>
-                </div>
+        <article className="v11-cueparcel">
+          <div className="shell">
+            <div className="v11-feature-rule v11-micro">
+              <span>02 / 04</span>
+              <span>{cueparcel.kicker}</span>
+            </div>
+            <div className="v11-cue-header">
+              <h3>
+                Cue<span>Parcel</span>
+              </h3>
+              <p>{cueparcel.summary}</p>
+            </div>
+            <div className="v11-cue-layout">
+              <ol className="v11-cue-steps" aria-label="CueParcel workflow">
+                {[
+                  ["01", "Pick"],
+                  ["02", "Cart"],
+                  ["03", "Recipe"],
+                  ["04", "TaskSpec"],
+                  ["05", "Receipt"],
+                ].map(([number, label]) => (
+                  <li key={label}>
+                    <span>{number}</span>
+                    {label}
+                  </li>
+                ))}
+              </ol>
+              <div className="v11-cue-media">
                 <ProjectImage
-                  src={project.image}
-                  alt={project.imageAlt}
-                  caption={project.imageCaption}
+                  src={cueparcel.image}
+                  alt={cueparcel.imageAlt}
+                  caption={cueparcel.imageCaption}
                 />
+                <Link
+                  className="v11-open-link"
+                  href={`/work/${cueparcel.slug}/`}
+                >
+                  Explore case study <span aria-hidden="true">↗</span>
+                </Link>
               </div>
-              {project.metrics && (
-                <div className="metric-strip">
-                  {project.metrics.map((metric) => (
-                    <div key={metric.label}>
-                      <strong>{metric.value}</strong>
-                      <span>{metric.label}</span>
-                    </div>
-                  ))}
+            </div>
+          </div>
+        </article>
+
+        <article className="shell v11-feature v11-agent">
+          <div className="v11-feature-rule v11-micro">
+            <span>03 / 04</span>
+            <span>{agentStudio.kicker}</span>
+          </div>
+          <div className="v11-agent-heading">
+            <h3>
+              Agent <em>Studio</em>
+            </h3>
+            <p>{agentStudio.summary}</p>
+          </div>
+          <div
+            className="v11-agent-sequence v11-micro"
+            aria-label="Agent Studio architecture"
+          >
+            {["Runtime", "Tool", "RAG", "Memory", "Trace", "Evaluation"].map(
+              (step, index) => (
+                <span key={step}>
+                  <small>0{index + 1}</small>
+                  {step}
+                </span>
+              ),
+            )}
+          </div>
+          <div className="v11-agent-media">
+            <ProjectImage
+              src={agentStudio.image}
+              alt={agentStudio.imageAlt}
+              caption={agentStudio.imageCaption}
+            />
+            <Link className="v11-open-link" href={`/work/${agentStudio.slug}/`}>
+              Explore case study <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
+        </article>
+
+        <article className="v11-skin">
+          <div className="shell">
+            <div className="v11-feature-rule v11-micro">
+              <span>04 / 04</span>
+              <span>{skinLesion.kicker}</span>
+            </div>
+            <div className="v11-skin-heading">
+              <h3>
+                Skin Lesion
+                <br />
+                <em>AI Platform</em>
+              </h3>
+              <p>{skinLesion.summary}</p>
+            </div>
+            <div
+              className="v11-skin-metrics"
+              aria-label="Stored evaluation results"
+            >
+              {skinLesion.metrics?.map((metric) => (
+                <div key={metric.label}>
+                  <strong>{metric.value}</strong>
+                  <span>{metric.label}</span>
                 </div>
-              )}
-            </article>
-          ))}
-        </div>
+              ))}
+            </div>
+            <div className="v11-skin-bottom">
+              <p>
+                Engineering practice.{" "}
+                <strong>Not a clinical diagnosis product.</strong>
+              </p>
+              <Link
+                className="v11-open-link"
+                href={`/work/${skinLesion.slug}/`}
+              >
+                Explore case study <span aria-hidden="true">↗</span>
+              </Link>
+            </div>
+            <ProjectImage
+              src={skinLesion.image}
+              alt={skinLesion.imageAlt}
+              caption={skinLesion.imageCaption}
+            />
+          </div>
+        </article>
       </section>
 
       <section
-        className="section section-tint"
+        className="v11-method shell"
         id="profile"
         aria-labelledby="profile-title"
       >
-        <div className="shell profile-grid">
-          <div>
-            <p className="section-index">02 / HOW I WORK</p>
-            <h2 id="profile-title">
-              Build it.
-              <br />
-              <em>Then prove it.</em>
-            </h2>
-          </div>
-          <div className="profile-copy">
-            <p>
-              Good AI products need more than a convincing answer. I work from
-              the input boundary to execution and evaluation: what entered the
-              system, what it did and what the evidence actually supports.
-            </p>
-            <div className="principles">
-              <div>
-                <span>01</span>
-                <strong>Inspectable</strong>
-                <p>Make the selected inputs and execution path visible.</p>
-              </div>
-              <div>
-                <span>02</span>
-                <strong>Bounded</strong>
-                <p>
-                  Give budgets, permissions and failure paths explicit limits.
-                </p>
-              </div>
-              <div>
-                <span>03</span>
-                <strong>Honest</strong>
-                <p>Keep unfavorable results and testing gaps in the story.</p>
-              </div>
+        <div className="v11-method-head">
+          <p className="v11-micro">02 / Working method</p>
+          <h2 id="profile-title">
+            <span>Build it.</span>
+            <span>
+              <em>Prove it.</em>
+            </span>
+          </h2>
+        </div>
+        <p className="v11-method-intro">
+          Good AI products need more than a convincing answer. I work from the
+          input boundary to execution and evaluation: what entered the system,
+          what it did and what the evidence actually supports.
+        </p>
+        <div className="v11-principles">
+          {[
+            [
+              "01",
+              "Inspectable",
+              "Make selected inputs and execution paths visible.",
+            ],
+            [
+              "02",
+              "Bounded",
+              "Give budgets, permissions and failure paths explicit limits.",
+            ],
+            [
+              "03",
+              "Honest",
+              "Keep unfavorable results and testing gaps in the story.",
+            ],
+          ].map(([number, title, description]) => (
+            <div key={number}>
+              <span className="v11-micro">{number}</span>
+              <strong>{title}</strong>
+              <p>{description}</p>
             </div>
-          </div>
+          ))}
         </div>
-      </section>
-
-      <section
-        className="section shell experience-section"
-        id="experience"
-        aria-labelledby="experience-title"
-      >
-        <div className="section-heading slim">
-          <p className="section-index">03 / EXPERIENCE</p>
-          <h2 id="experience-title">Industry practice.</h2>
-        </div>
-        <div className="experience-row">
-          <div className="experience-date">2026.08 — 2026.09</div>
+        <div className="v11-experience" id="experience">
+          <p className="v11-micro">03 / Industry practice</p>
           <div>
+            <span className="v11-micro">2026.08 — 2026.09</span>
             <h3>AI Engineer Intern</h3>
-            <p className="company">
-              Guangzhou Teddy Intelligence Technology Co., Ltd.
-            </p>
+            <p>Guangzhou Teddy Intelligence Technology Co., Ltd.</p>
             <p>
               Worked on a local skin lesion AI application across data audit,
               model training and evaluation, inference service and product
-              workflow. The independent external test exposed a meaningful drop
-              in accuracy and malignant recall; that result remains visible in
-              the case study.
+              workflow. The external result and its limitations remain visible
+              in the case study.
             </p>
-            <Link className="text-link" href="/work/skin-lesion-ai/">
+            <Link className="v11-open-link" href="/work/skin-lesion-ai/">
               Read the engineering case <span aria-hidden="true">↗</span>
             </Link>
           </div>
@@ -219,120 +310,120 @@ export default function Home() {
       </section>
 
       <section
-        className="section shell capabilities-section"
+        className="v11-index"
         id="capabilities"
         aria-labelledby="capabilities-title"
       >
-        <div className="section-heading slim">
-          <p className="section-index">04 / CAPABILITIES</p>
-          <h2 id="capabilities-title">
-            Skills, attached
-            <br />
-            to <em>work.</em>
-          </h2>
-        </div>
-        <div className="capability-list">
-          {capabilities.map((item, index) => (
-            <Link href={item.href} className="capability-row" key={item.name}>
-              <span className="capability-num">0{index + 1}</span>
-              <span className="capability-name">{item.name}</span>
-              <span className="capability-proof">{item.proof}</span>
-              <span aria-hidden="true">↗</span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <section
-        className="section shell evidence-section"
-        id="evidence"
-        aria-labelledby="evidence-title"
-      >
-        <div className="evidence-panel">
-          <p className="section-index">05 / OPEN SOURCE & EVIDENCE</p>
-          <h2 id="evidence-title">
-            Open the <em>source.</em>
-          </h2>
-          <p>
-            The case studies link to public repositories, architecture notes and
-            stored evaluations. CueParcel was added to the community&apos;s
-            Context Engineering Systems &amp; Kits list through a merged public
-            PR.
-          </p>
-          <div className="evidence-actions">
+        <div className="shell v11-index-inner">
+          <div className="v11-index-intro">
+            <p className="v11-micro">04 / Index of practice</p>
+            <h2 id="capabilities-title">
+              Skills,
+              <br />
+              <em>attached to work.</em>
+            </h2>
+          </div>
+          <div className="v11-index-list">
+            {capabilities.map((item, index) => (
+              <Link href={item.href} key={item.name}>
+                <span className="v11-micro">0{index + 1}</span>
+                <strong>{item.name}</strong>
+                <span>{item.proof}</span>
+                <span aria-hidden="true">↗</span>
+              </Link>
+            ))}
+          </div>
+          <p className="v11-index-source">
+            Source is part of the work:{" "}
             <a
               href="https://github.com/kallist"
               target="_blank"
               rel="noopener noreferrer"
             >
               GitHub profile ↗
-            </a>
+            </a>{" "}
+            ·{" "}
             <a
               href="https://github.com/yzfly/awesome-context-engineering/pull/50"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Merged PR #50 ↗
+              CueParcel merged PR #50 ↗
             </a>
-          </div>
+          </p>
         </div>
       </section>
 
       <section
-        className="section shell visual-section"
+        className="v11-visual shell"
         id="visual"
         aria-labelledby="visual-title"
       >
-        <div className="section-heading">
-          <p className="section-index">06 / VISUAL PRACTICE</p>
+        <div className="v11-visual-heading">
+          <p className="v11-micro">05 / Visual practice</p>
           <h2 id="visual-title">
-            Beyond <em>code.</em>
+            One drawing.
+            <br />
+            <em>Several ways to look.</em>
           </h2>
           <p>
-            Drawing and visual systems are part of how I think through form,
-            attention and communication.
+            Hand-drawn manga line work meets digital fragmentation. The same
+            original portrait is shown as one full work and two detail studies.
           </p>
         </div>
-        <div className="visual-grid">
-          <div className="visual-crop">
+        <figure className="v11-visual-full">
+          <img
+            src="/portrait/self-portrait.webp"
+            alt="Full black and white manga self portrait for kallist"
+            loading="lazy"
+            width="1448"
+            height="1086"
+          />
+          <figcaption>
+            <span>Full work / 01 of 01</span>
+            <span>Ink drawing · personal work</span>
+          </figcaption>
+        </figure>
+        <div className="v11-visual-details">
+          <figure className="v11-detail v11-detail-eye">
             <img
               src="/portrait/self-portrait.webp"
-              alt="Detail of Wei Zhuojie's black-and-white manga self portrait"
+              alt="Eye and crosshatching detail from the same self portrait"
               loading="lazy"
               width="1448"
               height="1086"
             />
-          </div>
-          <div className="visual-note">
-            <span className="note-number">01 / 01</span>
-            <h3>
-              Self portrait
-              <br />
-              in fragments.
-            </h3>
-            <p>
-              Hand-drawn manga line work meets digital fragmentation. This
-              original portrait is the visual anchor for the site. Additional
-              artwork will appear only when real pieces are available to curate.
-            </p>
-            <span className="visual-medium">Line art · personal work</span>
-          </div>
+            <figcaption>
+              Detail 01 / Eyes and linework — same artwork
+            </figcaption>
+          </figure>
+          <figure className="v11-detail v11-detail-fragments">
+            <img
+              src="/portrait/self-portrait.webp"
+              alt="Fragmented rectangles and directional strokes detail from the same self portrait"
+              loading="lazy"
+              width="1448"
+              height="1086"
+            />
+            <figcaption>Detail 02 / Fragmentation — same artwork</figcaption>
+          </figure>
         </div>
       </section>
 
       <section
-        className="contact-section"
+        className="v11-contact"
         id="contact"
         aria-labelledby="contact-title"
       >
         <div className="shell">
-          <p className="section-index">07 / CONTACT</p>
+          <div className="v11-contact-top v11-micro">
+            <span>06 / Continue the conversation</span>
+            <span>Context · Agents · Evidence · Art</span>
+          </div>
           <h2 id="contact-title">
-            Let&apos;s build
-            <br />
-            <em>something real.</em>
+            kallist<span aria-hidden="true">.</span>
           </h2>
-          <div className="contact-links">
+          <div className="v11-contact-links">
             <a href="mailto:2441397782@qq.com">
               2441397782@qq.com <span aria-hidden="true">↗</span>
             </a>
@@ -341,12 +432,12 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              GitHub / kallist <span aria-hidden="true">↗</span>
+              GitHub <span aria-hidden="true">↗</span>
             </a>
+            <Link href="/resume/">
+              Resume <span aria-hidden="true">↗</span>
+            </Link>
           </div>
-          <p className="contact-end">
-            AI engineering · Context systems · Visual practice
-          </p>
         </div>
       </section>
     </main>

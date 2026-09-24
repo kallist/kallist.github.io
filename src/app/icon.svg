@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="WZ monogram">
-  <rect width="64" height="64" fill="#171715"/>
-  <text x="7" y="44" fill="#faf9f6" font-family="Arial, Helvetica, sans-serif" font-size="31" font-weight="800" letter-spacing="-5">WZ</text>
-  <path d="M48 51h9" stroke="#a34e2d" stroke-width="4"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="kallist ink fragments">
+  <rect width="64" height="64" fill="#faf9f6"/>
+  <path d="M7 44 44 13M21 51 57 20M8 18l14 28" fill="none" stroke="#171715" stroke-width="5" stroke-linecap="square"/>
+  <rect x="47" y="43" width="8" height="8" transform="rotate(14 51 47)" fill="#a34e2d"/>
 </svg>

@@ -70,3 +70,13 @@ test("exported text is free of phone numbers, private paths and token-looking va
   assert.match(text, /78\.54%/);
   assert.match(text, /65\.49%/);
 });
+
+test("public homepage metadata and visible identity use kallist while resume keeps the real name", () => {
+  const home = readFileSync(join(root, "index.html"), "utf8");
+  const resume = readFileSync(join(root, "resume/index.html"), "utf8");
+  assert.match(home, /<title>kallist — AI systems, made inspectable<\/title>/);
+  assert.match(home, /<h1[^>]*>kallist/);
+  assert.doesNotMatch(home, /<h1[^>]*>Wei Zhuojie|<h1[^>]*>韦焯杰|>WZ</);
+  assert.match(resume, /Wei Zhuojie/);
+  assert.match(resume, /韦焯杰/);
+});

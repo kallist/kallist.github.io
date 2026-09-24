@@ -1,6 +1,6 @@
-# Wei Zhuojie portfolio
+# kallist portfolio
 
-An evidence-led static portfolio for AI engineering, context systems and visual practice. The source is Next.js 16 + TypeScript; `next build` produces a deployable `out/` directory for GitHub Pages. No backend, database, analytics or runtime GitHub requests.
+An evidence-led static portfolio for AI engineering, context systems and visual practice. `kallist` is the public brand; the public resume retains Wei Zhuojie's real identity. The source is Next.js 16 + TypeScript; `next build` produces a deployable `out/` directory for GitHub Pages. No backend, database, analytics or runtime GitHub requests.
 
 ## Local commands
 

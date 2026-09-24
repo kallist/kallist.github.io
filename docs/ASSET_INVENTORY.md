@@ -13,6 +13,6 @@ Assets were copied on 2026-09-23. Project images are originals from the cited pu
 | `public/projects/agent-studio-trace.png` | [Agent Studio source](https://github.com/kallist/agent-studio/blob/f3a35c8a1b52345dae7bca0f607f034c7dfdd176/docs/assets/run-trace.png) | Authentic screenshot of a demo/mock run, captioned |
 | `public/projects/skin-lesion-result.png` | [Skin Lesion source](https://github.com/kallist/skin-lesion-ai-platform/blob/fce9a176e787dc66b67d28a79c427bc0a34ebcda/docs/assets/screenshots/06_detect_result.png) | Authentic demo screenshot; no patient image implied |
 | `public/resume/wei-zhuojie-resume-public.pdf` | Chromium print from the site's phone-free `/resume/` route | One A4 page, rendered and text-extracted locally; no original resume PDF copied |
-| `src/app/icon.svg` | Repo-native WZ monogram | Site favicon, not a third-party image |
+| `src/app/icon.svg` | Repo-native abstract ink fragments | Replaces the WZ mark; drawn from the site's line-and-square grammar, not a third-party icon |
 
 No additional artwork was found in the supplied brief. The source resume PDFs are intentionally excluded from public assets.
