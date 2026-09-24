@@ -1,6 +1,6 @@
 # V1 → V1.1 visual evidence
 
-Captured 2026-09-24 in Chromium. **Before** is the public V1 site at `https://kallist.github.io/` before this branch; **after** is the V1.1 `next build` static export served locally. V1.1 has not been deployed. The WebP files retain the screenshot dimensions and only compress the browser captures. The Pear reference screenshots are not included.
+Captured 2026-09-24 in Chromium. **Before** is the public V1 site at `https://kallist.github.io/` before this branch; **after** is the original V1.1 `next build` static export served locally. At capture time V1.1 had not been deployed; it was later merged as `8ac462f` and became the production baseline for the [subsequent iteration](../v11-iteration/README.md). The WebP files retain the screenshot dimensions and only compress the browser captures. The Pear reference screenshots are not included.
 
 | View | Before | After |
 | --- | --- | --- |

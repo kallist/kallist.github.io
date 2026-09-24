@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element -- supplied artwork is served unchanged by static export */
 import Link from "next/link";
+import { ChapterTransition } from "@/components/chapter-transition";
 import { ProjectImage } from "@/components/project-image";
+import { SectionPattern } from "@/components/section-pattern";
 import { projects } from "@/content/projects";
 
 const [repobound, cueparcel, agentStudio, skinLesion] = projects;
@@ -31,7 +33,11 @@ const capabilities = [
 export default function Home() {
   return (
     <main id="main" className="v11-home">
-      <section className="v11-hero shell" aria-labelledby="hero-title">
+      <section
+        className="v11-hero shell v11-pattern-host"
+        aria-labelledby="hero-title"
+      >
+        <SectionPattern kind="hero" />
         <div className="v11-hero-overline v11-micro">
           <span>Independent practice / 2026</span>
           <span>Engineering × Visual thinking</span>
@@ -77,8 +83,14 @@ export default function Home() {
             Selected work <span aria-hidden="true">↓</span>
           </Link>
         </div>
+        <div className="v11-hero-education v11-micro" role="group" aria-label="Education">
+          <span>South China Agricultural University</span>
+          <span>Information Management &amp; Information Systems</span>
+          <span>Class of 2027</span>
+        </div>
       </section>
 
+      <ChapterTransition number="01" label="Selected work" />
       <section className="v11-work" id="work" aria-labelledby="work-title">
         <div className="shell v11-chapter-intro">
           <span className="v11-chapter-ghost" aria-hidden="true">
@@ -96,7 +108,8 @@ export default function Home() {
           </p>
         </div>
 
-        <article className="shell v11-feature v11-repobound">
+        <article className="shell v11-feature v11-repobound v11-pattern-host">
+          <SectionPattern kind="repobound" />
           <div className="v11-feature-rule v11-micro">
             <span>01 / 04</span>
             <span>{repobound.kicker}</span>
@@ -120,7 +133,8 @@ export default function Home() {
           </div>
         </article>
 
-        <article className="v11-cueparcel">
+        <article className="v11-cueparcel v11-pattern-host">
+          <SectionPattern kind="cueparcel" />
           <div className="shell">
             <div className="v11-feature-rule v11-micro">
               <span>02 / 04</span>
@@ -164,7 +178,8 @@ export default function Home() {
           </div>
         </article>
 
-        <article className="shell v11-feature v11-agent">
+        <article className="shell v11-feature v11-agent v11-pattern-host">
+          <SectionPattern kind="agent" />
           <div className="v11-feature-rule v11-micro">
             <span>03 / 04</span>
             <span>{agentStudio.kicker}</span>
@@ -200,7 +215,8 @@ export default function Home() {
           </div>
         </article>
 
-        <article className="v11-skin">
+        <article className="v11-skin v11-pattern-host">
+          <SectionPattern kind="skin" />
           <div className="shell">
             <div className="v11-feature-rule v11-micro">
               <span>04 / 04</span>
@@ -246,11 +262,13 @@ export default function Home() {
         </article>
       </section>
 
+      <ChapterTransition number="02" label="Working method" />
       <section
-        className="v11-method shell"
+        className="v11-method shell v11-pattern-host"
         id="profile"
         aria-labelledby="profile-title"
       >
+        <SectionPattern kind="method" />
         <div className="v11-method-head">
           <p className="v11-micro">02 / Working method</p>
           <h2 id="profile-title">
@@ -290,6 +308,16 @@ export default function Home() {
             </div>
           ))}
         </div>
+        <div className="v11-education" id="education">
+          <p className="v11-micro">Education / Class of 2027</p>
+          <div>
+            <h3>South China Agricultural University</h3>
+            <p className="v11-education-native">华南农业大学</p>
+            <p>Information Management &amp; Information Systems</p>
+            <p className="v11-education-native">信息管理与信息系统</p>
+            <span className="v11-micro">Undergraduate · 2023.09 — 2027.06</span>
+          </div>
+        </div>
         <div className="v11-experience" id="experience">
           <p className="v11-micro">03 / Industry practice</p>
           <div>
@@ -309,11 +337,13 @@ export default function Home() {
         </div>
       </section>
 
+      <ChapterTransition number="04" label="Index of practice" />
       <section
-        className="v11-index"
+        className="v11-index v11-pattern-host"
         id="capabilities"
         aria-labelledby="capabilities-title"
       >
+        <SectionPattern kind="index" />
         <div className="shell v11-index-inner">
           <div className="v11-index-intro">
             <p className="v11-micro">04 / Index of practice</p>
@@ -354,11 +384,13 @@ export default function Home() {
         </div>
       </section>
 
+      <ChapterTransition number="05" label="Visual practice" />
       <section
-        className="v11-visual shell"
+        className="v11-visual shell v11-pattern-host"
         id="visual"
         aria-labelledby="visual-title"
       >
+        <SectionPattern kind="visual" />
         <div className="v11-visual-heading">
           <p className="v11-micro">05 / Visual practice</p>
           <h2 id="visual-title">
@@ -386,35 +418,41 @@ export default function Home() {
         </figure>
         <div className="v11-visual-details">
           <figure className="v11-detail v11-detail-eye">
-            <img
-              src="/portrait/self-portrait.webp"
-              alt="Eye and crosshatching detail from the same self portrait"
-              loading="lazy"
-              width="1448"
-              height="1086"
-            />
+            <div className="v11-detail-image">
+              <img
+                src="/portrait/self-portrait.webp"
+                alt="Eye and crosshatching detail from the same self portrait"
+                loading="lazy"
+                width="1448"
+                height="1086"
+              />
+            </div>
             <figcaption>
               Detail 01 / Eyes and linework — same artwork
             </figcaption>
           </figure>
           <figure className="v11-detail v11-detail-fragments">
-            <img
-              src="/portrait/self-portrait.webp"
-              alt="Fragmented rectangles and directional strokes detail from the same self portrait"
-              loading="lazy"
-              width="1448"
-              height="1086"
-            />
+            <div className="v11-detail-image">
+              <img
+                src="/portrait/self-portrait.webp"
+                alt="Fragmented rectangles and directional strokes detail from the same self portrait"
+                loading="lazy"
+                width="1448"
+                height="1086"
+              />
+            </div>
             <figcaption>Detail 02 / Fragmentation — same artwork</figcaption>
           </figure>
         </div>
       </section>
 
+      <ChapterTransition number="06" label="Contact" />
       <section
-        className="v11-contact"
+        className="v11-contact v11-pattern-host"
         id="contact"
         aria-labelledby="contact-title"
       >
+        <SectionPattern kind="contact" />
         <div className="shell">
           <div className="v11-contact-top v11-micro">
             <span>06 / Continue the conversation</span>
@@ -438,6 +476,10 @@ export default function Home() {
               Resume <span aria-hidden="true">↗</span>
             </Link>
           </div>
+          <p className="v11-contact-credit v11-micro">
+            South China Agricultural University · Information Management &amp;
+            Information Systems · 2027
+          </p>
         </div>
       </section>
     </main>

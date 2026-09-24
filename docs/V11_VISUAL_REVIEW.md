@@ -1,6 +1,6 @@
 # V1.1 visual and engineering review
 
-This review records the static-export implementation on `feat/portfolio-v1.1-art-direction`. The before state is production V1 at `cdad931`; V1.1 is a Draft PR and is not production.
+This review records the original V1.1 static-export implementation from `feat/portfolio-v1.1-art-direction`. The before state was production V1 at `cdad931`; that V1.1 work was later merged as `8ac462f` and deployed. The subsequent pattern and education iteration is reviewed separately in [iteration notes](V11_PATTERN_ITERATION.md).
 
 ## Visual comparison
 
@@ -37,4 +37,4 @@ This review records the static-export implementation on `feat/portfolio-v1.1-art
 
 ## Remaining boundaries
 
-The Pear reference's video/film remained at 0% in automated Chromium; later animated frames were not used as implementation evidence. Physical phone, Safari, Firefox and screen-reader sessions have not been executed. Hosted CI is reported only after the Draft PR run completes.
+The Pear reference's video/film remained at 0% in automated Chromium; later animated frames were not used as implementation evidence. Physical phone, Safari, Firefox and screen-reader sessions were not executed for this original review. Hosted CI and the later production deployment passed for the original V1.1 release.

@@ -31,6 +31,85 @@ test("homepage presents the real portrait and four ordered, reachable cases", as
   ).toBeVisible();
 });
 
+test("education reads as homepage metadata and a profile annotation", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  const heroEducation = page.locator(".v11-hero-education");
+  await expect(heroEducation).toContainText(
+    "South China Agricultural University",
+  );
+  await expect(heroEducation).toContainText(
+    "Information Management & Information Systems",
+  );
+  await expect(heroEducation).toContainText("2027");
+  const educationFontSize = await heroEducation.evaluate((element) =>
+    Number.parseFloat(getComputedStyle(element).fontSize),
+  );
+  expect(educationFontSize).toBeGreaterThanOrEqual(12);
+  await expect(page.locator(".v11-education")).toContainText(
+    "2023.09 — 2027.06",
+  );
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("kallist.");
+  const dimensions = await page.evaluate(() => ({
+    scroll: document.documentElement.scrollWidth,
+    client: document.documentElement.clientWidth,
+  }));
+  expect(dimensions.scroll).toBeLessThanOrEqual(dimensions.client + 1);
+});
+
+test("chapter patterns respond to pointer, settle on leave and respect reduced motion", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await expect(page.locator(".v11-page-turn")).toHaveCount(5);
+  await expect(page.locator(".v11-pattern")).toHaveCount(9);
+  const pattern = page.locator('.v11-pattern[data-pattern="repobound"]');
+  await pattern.scrollIntoViewIfNeeded();
+  const first = pattern.locator("span").first();
+  const box = await first.boundingBox();
+  expect(box).not.toBeNull();
+  await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+  await expect
+    .poll(() => first.evaluate((node) => node.style.transform))
+    .not.toBe("");
+  await page.mouse.move(0, 0);
+  await expect
+    .poll(() => first.evaluate((node) => node.style.transform))
+    .toBe("");
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+  expect(await first.evaluate((node) => node.style.transform)).toBe("");
+});
+
+test("one full artwork ends in compact, labelled details without repeating a large image", async ({
+  page,
+}) => {
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const source = await page
+      .locator(".v11-visual-full img")
+      .getAttribute("src");
+    await expect(page.locator(".v11-detail")).toHaveCount(2);
+    for (const detail of await page.locator(".v11-detail").all()) {
+      await expect(detail.locator("img")).toHaveAttribute("src", source!);
+      await expect(detail.locator("figcaption")).toContainText("same artwork");
+      const imageBox = await detail.locator(".v11-detail-image").boundingBox();
+      const captionBox = await detail.locator("figcaption").boundingBox();
+      expect(imageBox).not.toBeNull();
+      expect(captionBox).not.toBeNull();
+      expect(imageBox!.height).toBeLessThanOrEqual(150);
+      expect(imageBox!.x + imageBox!.width).toBeLessThanOrEqual(
+        captionBox!.x + 1,
+      );
+    }
+  }
+});
+
 test("case studies deep load with real evidence links and honest captions", async ({
   page,
 }) => {

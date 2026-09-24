@@ -80,3 +80,12 @@ test("public homepage metadata and visible identity use kallist while resume kee
   assert.match(resume, /Wei Zhuojie/);
   assert.match(resume, /韦焯杰/);
 });
+
+test("exported homepage includes factual education in accessible text", () => {
+  const home = readFileSync(join(root, "index.html"), "utf8");
+  assert.match(home, /South China Agricultural University/);
+  assert.match(home, /Information Management &amp; Information Systems/);
+  assert.match(home, /Class of 2027/);
+  assert.match(home, /2023\.09/);
+  assert.match(home, /2027\.06/);
+});
