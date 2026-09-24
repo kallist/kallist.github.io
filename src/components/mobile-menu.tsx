@@ -5,9 +5,8 @@ import { useRef } from "react";
 
 const destinations = [
   { href: "/#work", label: "Work" },
-  { href: "/#profile", label: "Profile" },
-  { href: "/#experience", label: "Experience" },
-  { href: "/#visual", label: "Visual" },
+  { href: "/#profile", label: "Method" },
+  { href: "/#visual", label: "Art" },
   { href: "/resume/", label: "Resume" },
   { href: "/#contact", label: "Contact" },
 ];

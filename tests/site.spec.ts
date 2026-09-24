@@ -5,11 +5,11 @@ test("homepage presents the real portrait and four ordered, reachable cases", as
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Making AI",
-  );
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("kallist.");
+  await expect(page.locator(".brand")).toHaveText("kallist");
+  await expect(page.locator("main")).not.toContainText(/Wei Zhuojie|韦焯杰/);
   const portrait = page
-    .getByRole("img", { name: /self portrait by Wei Zhuojie/i })
+    .getByRole("img", { name: /self portrait for kallist/i })
     .first();
   await expect(portrait).toBeVisible();
   expect(
@@ -17,17 +17,17 @@ test("homepage presents the real portrait and four ordered, reachable cases", as
       (image: HTMLImageElement) => image.complete && image.naturalWidth > 0,
     ),
   ).toBe(true);
-  await expect(page.locator(".project-feature h3")).toHaveText([
-    "RepoBound",
-    "CueParcel",
-    "Agent Studio",
-    "Skin Lesion AI Platform",
+  await expect(page.locator(".v11-work article h3")).toHaveText([
+    /RepoBound/,
+    /CueParcel/,
+    /Agent Studio/,
+    /Skin Lesion\s*AI Platform/,
   ]);
   await expect(
     page.getByRole("link", { name: /Explore case study/i }),
   ).toHaveCount(4);
   await expect(
-    page.getByRole("heading", { name: /something real/i }),
+    page.getByRole("heading", { name: /kallist/i, level: 2 }),
   ).toBeVisible();
 });
 
@@ -74,10 +74,9 @@ test("phone-free resume prints and contact is a mailto", async ({ page }) => {
   });
   await page.getByRole("button", { name: /Print \/ Save as PDF/i }).click();
   await expect(page.locator("html")).toHaveAttribute("data-printed", "yes");
-  await expect(page.getByRole("link", { name: "Download PDF" })).toHaveAttribute(
-    "href",
-    "/resume/wei-zhuojie-resume-public.pdf",
-  );
+  await expect(
+    page.getByRole("link", { name: "Download PDF" }),
+  ).toHaveAttribute("href", "/resume/wei-zhuojie-resume-public.pdf");
   const pdfResponse = await page.request.get(
     "/resume/wei-zhuojie-resume-public.pdf",
   );
@@ -104,7 +103,7 @@ test("mobile and tablet layouts stay within viewport, with touch navigation", as
       `horizontal overflow at ${width}px`,
     ).toBeLessThanOrEqual(dimensions.client + 1);
     await expect(
-      page.getByText("RepoBound", { exact: true }).first(),
+      page.getByRole("heading", { name: /RepoBound/, level: 3 }),
     ).toBeVisible();
     await page.locator(".mobile-menu summary").click();
     await expect(
@@ -133,9 +132,7 @@ test("mobile section navigation closes its menu after selection", async ({
     .click();
   await expect(page).toHaveURL(/#work$/);
   await expect(page.locator(".mobile-menu")).not.toHaveAttribute("open", "");
-  await expect(
-    page.getByRole("heading", { name: /Systems with receipts/i }),
-  ).toBeVisible();
+  await expect(page.locator("#work-title")).toBeVisible();
 });
 
 test("intermediate widths and landscape have no horizontal overflow", async ({
@@ -145,6 +142,7 @@ test("intermediate widths and landscape have no horizontal overflow", async ({
     [844, 390],
     [1024, 768],
     [1280, 800],
+    [1440, 900],
   ]) {
     await page.setViewportSize({ width, height });
     await page.goto("/");
@@ -172,9 +170,28 @@ test("reduced motion keeps content visible and disables smooth scrolling", async
   ).toBe("auto");
   expect(
     await page
-      .locator(".hero-art img")
+      .locator(".v11-hero-portrait")
       .evaluate((node) => getComputedStyle(node).animationDuration),
   ).toBe("1e-05s");
+});
+
+test("desktop chapter navigation keeps work, method, art and resume reachable", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const nav = page.getByRole("navigation", { name: "Main navigation" });
+  await nav.getByRole("link", { name: "Method" }).click();
+  await expect(page).toHaveURL(/#profile$/);
+  await nav.getByRole("link", { name: "Art" }).click();
+  await expect(page).toHaveURL(/#visual$/);
+  await nav.getByRole("link", { name: "Work" }).click();
+  await expect(page).toHaveURL(/#work$/);
+  await nav.getByRole("link", { name: "Resume" }).click();
+  await expect(page).toHaveURL(/\/resume\/$/);
+  await expect(
+    page.getByRole("heading", { name: /Wei Zhuojie/i }),
+  ).toBeVisible();
 });
 
 test("keyboard skip link and case navigation work", async ({ page }) => {

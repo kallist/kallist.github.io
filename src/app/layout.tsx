@@ -2,22 +2,23 @@ import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import "./globals.css";
+import "./v11.css";
 
 const siteUrl = "https://kallist.github.io";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Wei Zhuojie — AI systems, made inspectable",
-    template: "%s | Wei Zhuojie",
+    default: "kallist — AI systems, made inspectable",
+    template: "%s | kallist",
   },
   description:
-    "Wei Zhuojie builds inspectable AI systems, repository context tools and agent products. Explore project evidence, engineering decisions and visual practice.",
+    "kallist builds inspectable AI systems, repository context tools and agent products. Explore project evidence, engineering decisions and visual practice.",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     url: siteUrl,
-    title: "Wei Zhuojie — AI systems, made inspectable",
+    title: "kallist — AI systems, made inspectable",
     description:
       "Context engineering, agent systems and product-minded AI engineering.",
     images: [
@@ -25,11 +26,14 @@ export const metadata: Metadata = {
         url: "/portrait/self-portrait.webp",
         width: 1448,
         height: 1086,
-        alt: "Black and white manga self portrait by Wei Zhuojie",
+        alt: "Black and white manga self portrait for kallist",
       },
     ],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    title: "kallist — AI systems, made inspectable",
+  },
   robots: { index: true, follow: true },
 };
 
