@@ -1627,9 +1627,11 @@
     top: 80px;
     bottom: auto;
   }
-  .v11-hero-education {
+  .v11-home .v11-hero-education {
     display: block;
     padding: 13px 0 25px;
+    font-size: 12px;
+    line-height: 1.45;
   }
   .v11-hero-education span {
     display: block;
@@ -1663,8 +1665,8 @@
   .v11-detail figcaption {
     font-size: 10px;
   }
-  .v11-contact-credit {
-    font-size: 10px;
+  .v11-home .v11-contact-credit {
+    font-size: 11px;
     line-height: 1.6;
   }
 }

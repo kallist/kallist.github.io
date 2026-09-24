@@ -44,6 +44,10 @@ test("education reads as homepage metadata and a profile annotation", async ({
     "Information Management & Information Systems",
   );
   await expect(heroEducation).toContainText("2027");
+  const educationFontSize = await heroEducation.evaluate((element) =>
+    Number.parseFloat(getComputedStyle(element).fontSize),
+  );
+  expect(educationFontSize).toBeGreaterThanOrEqual(12);
   await expect(page.locator(".v11-education")).toContainText(
     "2023.09 — 2027.06",
   );

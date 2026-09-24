@@ -32,3 +32,5 @@ All glyphs are decorative, server-rendered HTML; each pattern uses at most twelv
 ## Factual and performance boundaries
 
 The user supplied the school, major, undergraduate dates and class year. Hero metadata, the ruled profile annotation and a quiet contact credit make that identity discoverable without creating an Education card or changing the `kallist` brand. The resume retains its existing real-name identity. There is no Person structured data in this site; none was invented for this iteration. No dependencies, network calls, canvas, WebGL or animation library were added.
+
+In the final 390px static-export review, the shared microtype rule made Hero education metadata 10px. A scoped rule raised it to 12px, with an E2E computed-size regression assertion. The [fresh visual QA captures](visual-qa/v11-iteration/README.md) include combined Visual Practice-to-Ending views and a pointer response state.
