@@ -22,6 +22,8 @@ npm run e2e
 
 Project facts are in `src/content/projects.ts`. Source references, decisions and asset origins are in `docs/`. Images in `public/projects/` are copied from pinned public repository commits. The original supplied self portrait is in `assets/`; a WebP encoding of the same drawing is served in `public/portrait/`. The public resume is an HTML route with browser print styling and an inspected, phone-free PDF download. The private/source resume PDFs are deliberately excluded.
 
+The V2 homepage uses fixed measurement rails, a chapter overlay, transparent character fields and a numeric drawing of the university gate. See [V2 design system](docs/V2_DESIGN_SYSTEM.md), [reference audit](docs/V2_REFERENCE_AUDIT.md), [asset inventory](docs/ASSET_INVENTORY.md) and [visual QA](docs/visual-qa/v2/README.md). Earlier V1.1 documents remain as iteration history.
+
 ## Deployment
 
 The site is configured for the root GitHub Pages address `https://kallist.github.io` with static trailing-slash routes. CI validates pull requests. The Pages workflow deploys only on `main` or manual dispatch after repository Pages is configured to use GitHub Actions. A Draft PR alone does not deploy the site.
