@@ -76,7 +76,8 @@ test("public homepage metadata and visible identity use kallist while resume kee
   const home = readFileSync(join(root, "index.html"), "utf8");
   const resume = readFileSync(join(root, "resume/index.html"), "utf8");
   assert.match(home, /<title>kallist — AI systems, made inspectable<\/title>/);
-  assert.match(home, /<h1[^>]*>kallist/);
+  const heading = home.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/)?.[1].replace(/<[^>]+>/g, "").trim();
+  assert.equal(heading, "kallist.");
   assert.doesNotMatch(home, /<h1[^>]*>Wei Zhuojie|<h1[^>]*>韦焯杰|>WZ</);
   assert.match(resume, /Wei Zhuojie/);
   assert.match(resume, /韦焯杰/);

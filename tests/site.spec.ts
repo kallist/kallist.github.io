@@ -62,7 +62,7 @@ test("persistent rails, transparent fields and chapter overlay work by pointer a
   await page.goto("/");
   await expect(page.locator(".v2-rail")).toHaveCount(2);
   await expect(page.locator(".v2-pattern")).toHaveCount(9);
-  await expect(page.locator('.v2-pattern[data-pattern="repobound"] .v2-pattern-row')).toHaveCount(16);
+  await expect(page.locator('.v2-pattern[data-pattern="repobound"] .v2-pattern-row')).toHaveCount(30);
   const trigger = page.getByRole("button", { name: "Open chapter navigation" });
   await page.locator("#education").scrollIntoViewIfNeeded();
   await expect(trigger).toBeInViewport();
@@ -71,9 +71,43 @@ test("persistent rails, transparent fields and chapter overlay work by pointer a
   await expect(dialog).toBeVisible();
   await expect(dialog.getByRole("navigation", { name: "Chapter navigation" }).getByRole("link")).toHaveCount(7);
   await expect(dialog.locator('a[href="#education"]')).toHaveAttribute("aria-current", "location");
+  await dialog.locator('a[href="#work"]').hover();
+  await expect.poll(async () => dialog.locator('a[href="#work"] b').evaluate((node) => getComputedStyle(node).transform)).not.toBe("none");
   await page.keyboard.press("Escape");
   await expect(dialog).not.toBeVisible();
   await expect(trigger).toBeFocused();
+});
+
+test("work scenes use distinct evidence structures and a live reading rail", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await expect(page.locator(".v2-repo-scene .v2-repo-media img")).toBeVisible();
+  await expect(page.locator(".v2-cue-flow li")).toHaveCount(5);
+  await expect(page.locator(".v2-agent-coordinates li")).toHaveCount(6);
+  await expect(page.locator(".v2-skin-values > div")).toHaveCount(3);
+  expect(await page.locator(".v2-cue-scene").evaluate((node) => getComputedStyle(node).backgroundColor)).toBe("rgb(41, 42, 38)");
+  const metricSize = await page.locator(".v2-skin-values strong").first().evaluate((node) => Number.parseFloat(getComputedStyle(node).fontSize));
+  expect(metricSize).toBeGreaterThan(60);
+  const repoImage = await page.locator(".v2-repo-media img").boundingBox();
+  expect(repoImage?.width).toBeGreaterThan(500);
+  await page.locator(".v2-repo-scene").scrollIntoViewIfNeeded();
+  await expect(page.locator(".v2-repo-scene")).toHaveClass(/v2-in-view/);
+  const start = await page.locator(".v2-progress-readout").textContent();
+  await page.locator("#contact").scrollIntoViewIfNeeded();
+  await expect.poll(async () => page.locator(".v2-progress-readout").textContent()).not.toBe(start);
+  const fillHeight = await page.locator(".v2-progress-track i").evaluate((node) => Number.parseFloat((node as HTMLElement).style.height));
+  expect(fillHeight).toBeGreaterThan(50);
+});
+
+test("pointer shifts character fields while reduced motion keeps them still", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveClass(/v2-motion-ready/);
+  await page.mouse.move(1100, 300);
+  await expect.poll(async () => page.locator("#hero").evaluate((node) => (node as HTMLElement).style.getPropertyValue("--pattern-x"))).not.toBe("");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.mouse.move(900, 360);
+  await expect.poll(async () => page.locator("#hero").evaluate((node) => (node as HTMLElement).style.getPropertyValue("--pattern-x"))).toBe("");
 });
 
 test("body words and display text have hover feedback, and homepage images load", async ({ page }) => {
@@ -82,9 +116,12 @@ test("body words and display text have hover feedback, and homepage images load"
   const word = page.locator(".v2-hero-statement .v2-word").first();
   await word.hover();
   await expect.poll(() => word.evaluate((node) => getComputedStyle(node).backgroundSize)).toBe("100% 100%");
-  const heading = page.locator("#work-title");
-  await heading.hover();
-  expect(await heading.evaluate((node) => getComputedStyle(node).textShadow)).not.toBe("none");
+  const headingWord = page.locator("#work-title .v2-word").first();
+  await headingWord.scrollIntoViewIfNeeded();
+  await expect(page.locator(".v2-section-intro")).toHaveClass(/v2-in-view/);
+  await expect.poll(() => page.locator(".v2-section-intro").evaluate((node) => getComputedStyle(node).transform)).toBe("none");
+  await headingWord.hover();
+  await expect.poll(() => headingWord.evaluate((node) => getComputedStyle(node).backgroundSize)).toBe("100% 100%");
   for (const image of await page.locator(".v2-case-media img, .v2-hero-art img, .v2-education-art img, .v2-visual-art img").all()) {
     await image.scrollIntoViewIfNeeded();
     await expect.poll(() => image.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0)).toBe(true);
