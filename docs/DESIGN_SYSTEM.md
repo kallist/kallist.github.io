@@ -1,5 +1,7 @@
 # Kallist V1.1 design system
 
+Historical V1.1 record. The current homepage direction is [V2](V2_DESIGN_SYSTEM.md).
+
 ## Direction
 
 **Ink index.** An independent editorial practice that combines AI engineering evidence with the supplied manga self portrait. The public wordmark is `kallist`; the resume retains the real name. The interface uses paper, graphite, fine rules, extreme type scale, deliberate whitespace and a small rust accent. Pear informed abstract principles only; see [reference audit](V11_REFERENCE_AUDIT.md).

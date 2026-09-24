@@ -25,6 +25,7 @@ test("all public routes are exported as directly loadable HTML", () => {
 test("export contains the real portrait, pinned project images and SEO files", () => {
   for (const path of [
     "portrait/self-portrait.webp",
+    "graphics/scau-gate.svg",
     "projects/repobound-hero.png",
     "projects/cueparcel-lens.png",
     "projects/agent-studio-trace.png",
@@ -75,17 +76,20 @@ test("public homepage metadata and visible identity use kallist while resume kee
   const home = readFileSync(join(root, "index.html"), "utf8");
   const resume = readFileSync(join(root, "resume/index.html"), "utf8");
   assert.match(home, /<title>kallist — AI systems, made inspectable<\/title>/);
-  assert.match(home, /<h1[^>]*>kallist/);
+  const heading = home.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/)?.[1].replace(/<[^>]+>/g, "").trim();
+  assert.equal(heading, "kallist.");
   assert.doesNotMatch(home, /<h1[^>]*>Wei Zhuojie|<h1[^>]*>韦焯杰|>WZ</);
   assert.match(resume, /Wei Zhuojie/);
   assert.match(resume, /韦焯杰/);
 });
 
-test("exported homepage includes factual education in accessible text", () => {
+test("exported homepage includes factual Chinese education and the character gate", () => {
   const home = readFileSync(join(root, "index.html"), "utf8");
-  assert.match(home, /South China Agricultural University/);
-  assert.match(home, /Information Management &amp; Information Systems/);
-  assert.match(home, /Class of 2027/);
+  assert.match(home, /华南农业大学/);
+  assert.match(home, /信息管理与信息系统/);
+  assert.match(home, /本科/);
   assert.match(home, /2023\.09/);
   assert.match(home, /2027\.06/);
+  assert.match(home, /graphics\/scau-gate\.svg/);
+  assert.doesNotMatch(home, /Detail 01|Detail 02/);
 });

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-labelledby="title">
+  <title id="title">华南农业大学校门的数字字符构图</title>
+  <defs>
+    <pattern id="digits" width="190" height="42" patternUnits="userSpaceOnUse">
+      <text x="0" y="18" font-family="monospace" font-size="14" letter-spacing="4" fill="#eee7dc">2023 00 2027 01</text>
+      <text x="14" y="38" font-family="monospace" font-size="12" letter-spacing="3" fill="#c8baaa">华农 / 信管 / 本科</text>
+    </pattern>
+    <pattern id="fine" width="14" height="14" patternUnits="userSpaceOnUse">
+      <path d="M0 14L14 0" fill="none" stroke="#b7a996" stroke-width=".7"/>
+    </pattern>
+  </defs>
+  <g fill="none" stroke="#a99b88" stroke-width="1" opacity=".65">
+    <path d="M32 582H1168M32 118H1168M600 40V626M176 42V622M1024 42V622" stroke-dasharray="3 11"/>
+    <path d="M32 570v24m1136-24v24M588 40h24M588 626h24"/>
+  </g>
+  <g fill="url(#digits)" stroke="#eadfd0" stroke-width="2">
+    <path d="M130 272h940l-25 53H155z"/>
+    <path d="M185 246l100-46h630l100 46-10 35H195z"/>
+    <path d="M265 189l90-58h490l90 58-20 21H285z"/>
+    <path d="M390 125l60-56h300l60 56-14 23H404z"/>
+    <path d="M96 300h64v270H96zM1040 300h64v270h-64z"/>
+    <path d="M236 294h78v276h-78zM886 294h78v276h-78z"/>
+    <path d="M414 280h94v290h-94zM692 280h94v290h-94z"/>
+    <path d="M510 280h180v84H510z"/>
+    <path d="M83 560h90v25H83zM225 560h100v25H225zM402 560h118v25H402zM680 560h118v25H680zM875 560h100v25H875zM1027 560h90v25h-90z"/>
+    <path d="M96 263c0-27 15-37 32-56 17 19 32 29 32 56zM236 256c0-28 17-43 39-67 22 24 39 39 39 67zM886 256c0-28 17-43 39-67 22 24 39 39 39 67zM1040 263c0-27 15-37 32-56 17 19 32 29 32 56z"/>
+    <path d="M414 240c0-30 18-48 47-76 29 28 47 46 47 76zM692 240c0-30 18-48 47-76 29 28 47 46 47 76z"/>
+  </g>
+  <g fill="url(#fine)" opacity=".55">
+    <path d="M345 324h70v237h-70zM785 324h70v237h-70z"/>
+    <path d="M530 386c0-25 24-46 70-46s70 21 70 46v177H530z"/>
+  </g>
+  <g fill="none" stroke="#efe6d8" stroke-width="1.6">
+    <path d="M345 570V324h70v246M785 570V324h70v246M530 570V386c0-25 24-46 70-46s70 21 70 46v184"/>
+    <path d="M580 304h40M86 590h1028"/>
+  </g>
+  <text x="600" y="332" text-anchor="middle" font-family="serif" font-size="24" letter-spacing="11" fill="#faf5ec">华南农业大学</text>
+  <g fill="#dacdbc" font-family="monospace" font-size="11" letter-spacing="2"><text x="32" y="104">2023.09</text><text x="1050" y="104">2027.06</text><text x="32" y="612">00 / 华农</text><text x="1000" y="612">数字构图 / 01</text></g>
+</svg>

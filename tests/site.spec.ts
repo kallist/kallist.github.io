@@ -17,7 +17,7 @@ test("homepage presents the real portrait and four ordered, reachable cases", as
       (image: HTMLImageElement) => image.complete && image.naturalWidth > 0,
     ),
   ).toBe(true);
-  await expect(page.locator(".v11-work article h3")).toHaveText([
+  await expect(page.locator(".v2-work article h3")).toHaveText([
     /RepoBound/,
     /CueParcel/,
     /Agent Studio/,
@@ -31,26 +31,22 @@ test("homepage presents the real portrait and four ordered, reachable cases", as
   ).toBeVisible();
 });
 
-test("education reads as homepage metadata and a profile annotation", async ({
+test("education is Chinese-only and its campus gate is rendered as character art", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
-  const heroEducation = page.locator(".v11-hero-education");
-  await expect(heroEducation).toContainText(
-    "South China Agricultural University",
-  );
-  await expect(heroEducation).toContainText(
-    "Information Management & Information Systems",
-  );
-  await expect(heroEducation).toContainText("2027");
-  const educationFontSize = await heroEducation.evaluate((element) =>
+  const education = page.locator("#education");
+  await expect(education).toContainText("华南农业大学");
+  await expect(education).toContainText("信息管理与信息系统");
+  await expect(education).toContainText("本科");
+  await expect(education).toContainText("2023.09 — 2027.06");
+  await expect(education).not.toContainText(/South China Agricultural University|Information Management/);
+  await expect(education.getByRole("img", { name: /数字与汉字描绘的华南农业大学校门/ })).toHaveAttribute("src", "/graphics/scau-gate.svg");
+  const educationFontSize = await education.locator(".v2-education-copy > p").evaluate((element) =>
     Number.parseFloat(getComputedStyle(element).fontSize),
   );
-  expect(educationFontSize).toBeGreaterThanOrEqual(12);
-  await expect(page.locator(".v11-education")).toContainText(
-    "2023.09 — 2027.06",
-  );
+  expect(educationFontSize).toBeGreaterThanOrEqual(20);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("kallist.");
   const dimensions = await page.evaluate(() => ({
     scroll: document.documentElement.scrollWidth,
@@ -59,54 +55,88 @@ test("education reads as homepage metadata and a profile annotation", async ({
   expect(dimensions.scroll).toBeLessThanOrEqual(dimensions.client + 1);
 });
 
-test("chapter patterns respond to pointer, settle on leave and respect reduced motion", async ({
+test("persistent rails, transparent fields and chapter overlay work by pointer and keyboard", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  await expect(page.locator(".v11-page-turn")).toHaveCount(5);
-  await expect(page.locator(".v11-pattern")).toHaveCount(9);
-  const pattern = page.locator('.v11-pattern[data-pattern="repobound"]');
-  await pattern.scrollIntoViewIfNeeded();
-  const first = pattern.locator("span").first();
-  const box = await first.boundingBox();
-  expect(box).not.toBeNull();
-  await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
-  await expect
-    .poll(() => first.evaluate((node) => node.style.transform))
-    .not.toBe("");
-  await page.mouse.move(0, 0);
-  await expect
-    .poll(() => first.evaluate((node) => node.style.transform))
-    .toBe("");
-
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
-  expect(await first.evaluate((node) => node.style.transform)).toBe("");
+  await expect(page.locator(".v2-rail")).toHaveCount(2);
+  await expect(page.locator(".v2-pattern")).toHaveCount(9);
+  await expect(page.locator('.v2-pattern[data-pattern="repobound"] .v2-pattern-row')).toHaveCount(30);
+  const trigger = page.getByRole("button", { name: "Open chapter navigation" });
+  await page.locator("#education").scrollIntoViewIfNeeded();
+  await expect(trigger).toBeInViewport();
+  await trigger.click();
+  const dialog = page.getByRole("dialog", { name: "Chapters" });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole("navigation", { name: "Chapter navigation" }).getByRole("link")).toHaveCount(7);
+  await expect(dialog.locator('a[href="#education"]')).toHaveAttribute("aria-current", "location");
+  await dialog.locator('a[href="#work"]').hover();
+  await expect.poll(async () => dialog.locator('a[href="#work"] b').evaluate((node) => getComputedStyle(node).transform)).not.toBe("none");
+  await page.keyboard.press("Escape");
+  await expect(dialog).not.toBeVisible();
+  await expect(trigger).toBeFocused();
 });
 
-test("one full artwork ends in compact, labelled details without repeating a large image", async ({
+test("work scenes use distinct evidence structures and a live reading rail", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await expect(page.locator(".v2-repo-scene .v2-repo-media img")).toBeVisible();
+  await expect(page.locator(".v2-cue-flow li")).toHaveCount(5);
+  await expect(page.locator(".v2-agent-coordinates li")).toHaveCount(6);
+  await expect(page.locator(".v2-skin-values > div")).toHaveCount(3);
+  expect(await page.locator(".v2-cue-scene").evaluate((node) => getComputedStyle(node).backgroundColor)).toBe("rgb(41, 42, 38)");
+  const metricSize = await page.locator(".v2-skin-values strong").first().evaluate((node) => Number.parseFloat(getComputedStyle(node).fontSize));
+  expect(metricSize).toBeGreaterThan(60);
+  const repoImage = await page.locator(".v2-repo-media img").boundingBox();
+  expect(repoImage?.width).toBeGreaterThan(500);
+  await page.locator(".v2-repo-scene").scrollIntoViewIfNeeded();
+  await expect(page.locator(".v2-repo-scene")).toHaveClass(/v2-in-view/);
+  const start = await page.locator(".v2-progress-readout").textContent();
+  await page.locator("#contact").scrollIntoViewIfNeeded();
+  await expect.poll(async () => page.locator(".v2-progress-readout").textContent()).not.toBe(start);
+  const fillHeight = await page.locator(".v2-progress-track i").evaluate((node) => Number.parseFloat((node as HTMLElement).style.height));
+  expect(fillHeight).toBeGreaterThan(50);
+});
+
+test("pointer shifts character fields while reduced motion keeps them still", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveClass(/v2-motion-ready/);
+  await page.mouse.move(1100, 300);
+  await expect.poll(async () => page.locator("#hero").evaluate((node) => (node as HTMLElement).style.getPropertyValue("--pattern-x"))).not.toBe("");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.mouse.move(900, 360);
+  await expect.poll(async () => page.locator("#hero").evaluate((node) => (node as HTMLElement).style.getPropertyValue("--pattern-x"))).toBe("");
+});
+
+test("body words and display text have hover feedback, and homepage images load", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const word = page.locator(".v2-hero-statement .v2-word").first();
+  await word.hover();
+  await expect.poll(() => word.evaluate((node) => getComputedStyle(node).backgroundSize)).toBe("100% 100%");
+  const headingWord = page.locator("#work-title .v2-word").first();
+  await headingWord.scrollIntoViewIfNeeded();
+  await expect(page.locator(".v2-section-intro")).toHaveClass(/v2-in-view/);
+  await expect.poll(() => page.locator(".v2-section-intro").evaluate((node) => getComputedStyle(node).transform)).toBe("none");
+  await headingWord.hover();
+  await expect.poll(() => headingWord.evaluate((node) => getComputedStyle(node).backgroundSize)).toBe("100% 100%");
+  for (const image of await page.locator(".v2-case-media img, .v2-hero-art img, .v2-education-art img, .v2-visual-art img").all()) {
+    await image.scrollIntoViewIfNeeded();
+    await expect.poll(() => image.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0)).toBe(true);
+  }
+});
+
+test("visual practice presents exactly one artwork and no rejected detail crops", async ({
   page,
 }) => {
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
-    const source = await page
-      .locator(".v11-visual-full img")
-      .getAttribute("src");
-    await expect(page.locator(".v11-detail")).toHaveCount(2);
-    for (const detail of await page.locator(".v11-detail").all()) {
-      await expect(detail.locator("img")).toHaveAttribute("src", source!);
-      await expect(detail.locator("figcaption")).toContainText("same artwork");
-      const imageBox = await detail.locator(".v11-detail-image").boundingBox();
-      const captionBox = await detail.locator("figcaption").boundingBox();
-      expect(imageBox).not.toBeNull();
-      expect(captionBox).not.toBeNull();
-      expect(imageBox!.height).toBeLessThanOrEqual(150);
-      expect(imageBox!.x + imageBox!.width).toBeLessThanOrEqual(
-        captionBox!.x + 1,
-      );
-    }
+    await expect(page.locator("#visual img")).toHaveCount(1);
+    await expect(page.locator("#visual figcaption")).toContainText("Original drawing");
+    await expect(page.locator("#visual")).not.toContainText(/Detail 01|Detail 02|same artwork/);
   }
 });
 
@@ -182,35 +212,31 @@ test("mobile and tablet layouts stay within viewport, with touch navigation", as
       `horizontal overflow at ${width}px`,
     ).toBeLessThanOrEqual(dimensions.client + 1);
     await expect(
-      page.getByRole("heading", { name: /RepoBound/, level: 3 }),
+      page.getByRole("heading", { name: /Repo\s*Bound/, level: 3 }),
     ).toBeVisible();
-    await page.locator(".mobile-menu summary").click();
-    await expect(
-      page
-        .getByRole("navigation", { name: "Mobile navigation" })
-        .getByRole("link", { name: "Resume" }),
-    ).toBeVisible();
+    await page.getByRole("button", { name: "Open chapter navigation" }).click();
+    await expect(page.getByRole("navigation", { name: "Chapter navigation" }).getByRole("link", { name: /Resume/ })).toBeVisible();
     await page
-      .getByRole("navigation", { name: "Mobile navigation" })
-      .getByRole("link", { name: "Resume" })
+      .getByRole("navigation", { name: "Chapter navigation" })
+      .getByRole("link", { name: /Resume/ })
       .click();
     await expect(page).toHaveURL(/\/resume\/$/);
   }
 });
 
-test("mobile section navigation closes its menu after selection", async ({
+test("mobile chapter navigation closes its overlay after selection", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   await page.waitForLoadState("networkidle");
-  await page.locator(".mobile-menu summary").click();
+  await page.getByRole("button", { name: "Open chapter navigation" }).click();
   await page
-    .getByRole("navigation", { name: "Mobile navigation" })
-    .getByRole("link", { name: "Work" })
+    .getByRole("navigation", { name: "Chapter navigation" })
+    .getByRole("link", { name: /Selected work/ })
     .click();
   await expect(page).toHaveURL(/#work$/);
-  await expect(page.locator(".mobile-menu")).not.toHaveAttribute("open", "");
+  await expect(page.getByRole("dialog", { name: "Chapters" })).not.toBeVisible();
   await expect(page.locator("#work-title")).toBeVisible();
 });
 
@@ -248,9 +274,7 @@ test("reduced motion keeps content visible and disables smooth scrolling", async
     ),
   ).toBe("auto");
   expect(
-    await page
-      .locator(".v11-hero-portrait")
-      .evaluate((node) => getComputedStyle(node).animationDuration),
+    await page.locator(".v2-hero-art").evaluate((node) => getComputedStyle(node).transitionDuration),
   ).toBe("1e-05s");
 });
 
@@ -259,13 +283,18 @@ test("desktop chapter navigation keeps work, method, art and resume reachable", 
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  const nav = page.getByRole("navigation", { name: "Main navigation" });
+  const trigger = page.getByRole("button", { name: "Open chapter navigation" });
+  await trigger.click();
+  const nav = page.getByRole("navigation", { name: "Chapter navigation" });
   await nav.getByRole("link", { name: "Method" }).click();
   await expect(page).toHaveURL(/#profile$/);
-  await nav.getByRole("link", { name: "Art" }).click();
+  await trigger.click();
+  await nav.getByRole("link", { name: /Visual practice/ }).click();
   await expect(page).toHaveURL(/#visual$/);
-  await nav.getByRole("link", { name: "Work" }).click();
+  await trigger.click();
+  await nav.getByRole("link", { name: /Selected work/ }).click();
   await expect(page).toHaveURL(/#work$/);
+  await trigger.click();
   await nav.getByRole("link", { name: "Resume" }).click();
   await expect(page).toHaveURL(/\/resume\/$/);
   await expect(
