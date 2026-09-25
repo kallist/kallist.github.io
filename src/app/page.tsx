@@ -5,6 +5,8 @@ import { ProjectImage } from "@/components/project-image";
 import { RevealObserver } from "@/components/reveal-observer";
 import { SectionPattern } from "@/components/section-pattern";
 import { WordHover } from "@/components/word-hover";
+import { AsciiTree } from "@/components/ascii-tree";
+import { GalleryRibbon } from "@/components/gallery-ribbon";
 import { projects } from "@/content/projects";
 
 const [repobound, cueparcel, agentStudio, skinLesion] = projects;
@@ -21,6 +23,7 @@ export default function Home() {
   return <main id="main" className="v2-home">
     <ChapterNavigation />
     <RevealObserver />
+    <AsciiTree />
 
     <section id="hero" className="v2-hero v2-field-host" aria-labelledby="hero-title">
       <SectionPattern kind="hero" />
@@ -131,9 +134,9 @@ export default function Home() {
     <section id="visual" className="v2-visual v2-field-host" aria-labelledby="visual-title">
       <SectionPattern kind="visual" />
       <div className="v2-frame"><ChapterMark number="04" title="Visual practice" />
-        <div className="v2-visual-heading v2-reveal"><h2 id="visual-title"><WordHover text="The line" /> <em><WordHover text="remains." /></em></h2><p><WordHover text="One original drawing. Hand-drawn manga line work meets digital fragmentation." /></p></div>
-        <figure className="v2-visual-art v2-reveal"><img src="/portrait/self-portrait.webp" alt="Full black and white manga self portrait for kallist" loading="lazy" width="1448" height="1086" /><figcaption><span>FIG 04 / Original drawing</span><span>Ink drawing · personal work</span></figcaption></figure>
+        <div className="v2-visual-heading v2-reveal"><h2 id="visual-title"><WordHover text="The line" /> <em><WordHover text="remains." /></em></h2><p><WordHover text="Four supplied images in a continuous field of color, ink and sequential line work." /></p></div>
       </div>
+      <GalleryRibbon />
     </section>
 
     <section id="contact" className="v2-contact v2-field-host" aria-labelledby="contact-title">

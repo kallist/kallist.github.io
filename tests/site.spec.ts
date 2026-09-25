@@ -122,22 +122,63 @@ test("body words and display text have hover feedback, and homepage images load"
   await expect.poll(() => page.locator(".v2-section-intro").evaluate((node) => getComputedStyle(node).transform)).toBe("none");
   await headingWord.hover();
   await expect.poll(() => headingWord.evaluate((node) => getComputedStyle(node).backgroundSize)).toBe("100% 100%");
-  for (const image of await page.locator(".v2-case-media img, .v2-hero-art img, .v2-education-art img, .v2-visual-art img").all()) {
+  for (const image of await page.locator(".v2-case-media img, .v2-hero-art img, .v2-education-art img").all()) {
     await image.scrollIntoViewIfNeeded();
+    await expect.poll(() => image.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0)).toBe(true);
+  }
+  for (const image of await page.locator(".v21-gallery-set:not([aria-hidden]) img").all()) {
     await expect.poll(() => image.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0)).toBe(true);
   }
 });
 
-test("visual practice presents exactly one artwork and no rejected detail crops", async ({
+test("visual practice is a data-driven, draggable four-work band with a motion control", async ({
   page,
 }) => {
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
-    await expect(page.locator("#visual img")).toHaveCount(1);
-    await expect(page.locator("#visual figcaption")).toContainText("Original drawing");
-    await expect(page.locator("#visual")).not.toContainText(/Detail 01|Detail 02|same artwork/);
+    const gallery = page.locator(".v21-gallery");
+    await expect(gallery).toHaveAttribute("data-gallery-count", "4");
+    const images = gallery.locator(".v21-gallery-track--main .v21-gallery-set:not([aria-hidden]) img");
+    await expect(images).toHaveCount(4);
+    expect(new Set(await images.evaluateAll((nodes) => nodes.map((node) => (node as HTMLImageElement).src))).size).toBe(4);
+    await expect(gallery.locator(".v21-gallery-track--main .v21-gallery-set[aria-hidden='true']")).toHaveCount(1);
+    await expect(gallery.getByRole("button", { name: "Pause motion" })).toBeVisible();
+    await gallery.getByRole("button", { name: "Pause motion" }).click();
+    await expect(gallery).toHaveAttribute("data-paused", "true");
+    await gallery.getByRole("button", { name: "Resume motion" }).click();
+    await expect(gallery).toHaveAttribute("data-paused", "false");
+    await gallery.locator(".v21-gallery-window").scrollIntoViewIfNeeded();
+    const viewport = gallery.locator(".v21-gallery-window");
+    const before = await viewport.evaluate((node) => node.scrollLeft);
+    const box = await viewport.boundingBox();
+    if (!box) throw new Error("Gallery window has no bounds");
+    await page.mouse.move(box.x + box.width * .7, box.y + box.height * .4);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width * .3, box.y + box.height * .4, { steps: 5 });
+    await page.mouse.up();
+    expect(await viewport.evaluate((node) => node.scrollLeft)).toBeGreaterThan(before);
+    await expect(gallery).not.toContainText(/Detail 01|Detail 02|same artwork/);
   }
+});
+
+test("ASCII tree stays behind readable content and becomes static in reduced motion", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const tree = page.locator("[data-global-ascii-tree]");
+  await expect(tree).toHaveCount(1);
+  await expect(tree.locator("img")).toHaveCount(2);
+  for (const image of await tree.locator("img").all()) {
+    expect(await image.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0)).toBe(true);
+  }
+  expect(await tree.evaluate((node) => getComputedStyle(node).position)).toBe("fixed");
+  expect(await tree.evaluate((node) => getComputedStyle(node).pointerEvents)).toBe("none");
+  await page.locator("#work").scrollIntoViewIfNeeded();
+  await expect(page.getByRole("link", { name: /Explore case study/i }).first()).toBeVisible();
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  expect(await tree.locator(".v2-tree-near").evaluate((node) => getComputedStyle(node).animationName)).toBe("none");
+  expect(await page.locator(".v21-gallery-track--main").evaluate((node) => getComputedStyle(node).animationName)).toBe("none");
+  await expect(page.locator(".v21-gallery-track--main .v21-gallery-set:not([aria-hidden]) img")).toHaveCount(4);
 });
 
 test("case studies deep load with real evidence links and honest captions", async ({

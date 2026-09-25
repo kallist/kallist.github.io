@@ -26,6 +26,12 @@ test("export contains the real portrait, pinned project images and SEO files", (
   for (const path of [
     "portrait/self-portrait.webp",
     "graphics/scau-gate.svg",
+    "graphics/ascii-tree-near.svg",
+    "graphics/ascii-tree-far.svg",
+    "gallery/birthday-color.webp",
+    "gallery/birthday-ink.webp",
+    "gallery/comic-two-panel.webp",
+    "gallery/comic-triptych.webp",
     "projects/repobound-hero.png",
     "projects/cueparcel-lens.png",
     "projects/agent-studio-trace.png",
@@ -92,4 +98,12 @@ test("exported homepage includes factual Chinese education and the character gat
   assert.match(home, /2027\.06/);
   assert.match(home, /graphics\/scau-gate\.svg/);
   assert.doesNotMatch(home, /Detail 01|Detail 02/);
+});
+
+test("exported visual practice identifies four distinct supplied works", () => {
+  const home = readFileSync(join(root, "index.html"), "utf8");
+  assert.match(home, /data-gallery-count="4"/);
+  for (const name of ["birthday-color", "birthday-ink", "comic-two-panel", "comic-triptych"]) {
+    assert.match(home, new RegExp(`gallery/${name}\\.webp`));
+  }
 });
