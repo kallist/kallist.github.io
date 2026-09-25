@@ -14,12 +14,13 @@ const vocab: Record<PatternKind, string[]> = {
   contact: ["kallist", "github", "mail", "resume", "00", "/"],
 };
 
-const graphicKinds = new Set<PatternKind>(["repobound", "cueparcel", "agent", "skin"]);
+const graphicKinds = new Set<PatternKind>(["repobound", "cueparcel", "agent", "skin", "education"]);
 const glyphs: Record<string, string> = {
   repobound: "01#[]{}+-=/:",
   cueparcel: ">:/01#-=+._",
   agent: "01+|-[]{}=:#",
   skin: "0123456789%.:#",
+  education: "01+#%=/:\\._华农本信管",
 };
 
 function graphicRow(kind: PatternKind, row: number) {
@@ -45,6 +46,11 @@ function graphicRow(kind: PatternKind, row: number) {
     } else if (kind === "skin") {
       const radius = Math.sqrt(((x - .52) / .42) ** 2 + ((y - .5) / .46) ** 2);
       density = radius < .95 && radius > .38 ? (row % 4 === 0 ? .88 : .58) : .025;
+    } else if (kind === "education") {
+      const cloud = Math.sqrt(((x - .41) / .51) ** 2 + ((y - .5) / .42) ** 2);
+      const nearGate = x > .08 && x < .77 && y > .2 && y < .83;
+      const roofEcho = Math.abs(y - (.42 - .17 * Math.abs(x - .43))) < .055;
+      density = cloud < 1 ? (roofEcho && nearGate ? .31 : .045 + .06 * (1 - cloud)) : 0;
     }
     const bank = glyphs[kind] ?? "01";
     const symbol = noise < density ? bank[(column * 7 + row * 13) % bank.length] : " ";
@@ -52,7 +58,7 @@ function graphicRow(kind: PatternKind, row: number) {
     return column % 8 === 7 && /\d/.test(symbol) ? " " : symbol;
   });
   const fragment: Partial<Record<PatternKind, string>> = {
-    repobound: "pack[]", cueparcel: "receipt/", agent: "trace->eval", skin: "92.96%",
+    repobound: "pack[]", cueparcel: "receipt/", agent: "trace->eval", skin: "92.96%", education: "华农/2027",
   };
   if (row === 8 && fragment[kind]) chars.splice(24, fragment[kind]!.length, ...fragment[kind]!);
   return chars.join("");

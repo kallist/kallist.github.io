@@ -1,0 +1,24 @@
+{
+  "url": "http://127.0.0.1:4173/",
+  "results": [
+    {
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "galleryMotion": {
+        "before": "matrix(1, 0, 0, 1, -34.9391, 0)",
+        "after": "matrix(1, 0, 0, 1, -81.8776, 0)",
+        "changed": true
+      }
+    },
+    {
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "width": 390,
+      "overflow": 0
+    }
+  ]
+}
