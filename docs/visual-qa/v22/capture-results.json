@@ -1,0 +1,30 @@
+{
+  "url": "http://127.0.0.1:4173/",
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 900,
+      "glyphs": 5737,
+      "overflowPx": 0
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "glyphs": 3421,
+      "overflowPx": 0
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "glyphs": 1882,
+      "overflowPx": 0
+    }
+  ],
+  "motion": {
+    "intervalMs": 5500,
+    "changedPixelsOverInterval": 113365,
+    "changedPixelsWithPointerAndTime": 67987,
+    "taskSeconds": 1.8,
+    "scriptSeconds": 0.88
+  }
+}

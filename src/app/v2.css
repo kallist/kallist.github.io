@@ -16,7 +16,7 @@ body:has(.v2-home) .site-footer { display: none; }
   overflow: clip;
 }
 .v2-home section, .v2-home article { position: relative; scroll-margin-top: 0; }
-.v2-home > section { z-index: 1; }
+.v2-home > section { z-index: auto; }
 .v2-home h1, .v2-home h2, .v2-home h3, .v2-home p, .v2-home figure { margin: 0; }
 .v2-home a, .v2-home button { cursor: pointer; }
 .v2-frame { width: calc(100% - var(--v2-rail) * 2 - var(--v2-gutter) * 2); max-width: 1510px; margin-inline: auto; position: relative; z-index: 2; }
@@ -171,6 +171,7 @@ body:has(.v2-home) .site-footer { display: none; }
 .v2-reveal { transition: opacity .8s ease, transform .85s var(--ease), clip-path .85s var(--ease); }
 .v2-education-copy { transition-delay: .12s; }
 .v2-in-view { opacity: 1; transform: none; clip-path: inset(0 0 0 0); }
+.v2-scene.v2-in-view { clip-path: none; }
 .v2-motion-ready .v2-chapter-mark:not(.v2-in-view) { clip-path: inset(0 60% 0 0); }
 
 @media (max-width: 1050px) {
@@ -473,18 +474,16 @@ body:has(.v2-home) .site-footer { display: none; }
   .v2-word:hover { translate: none; }
 }
 
-/* The character tree enters first, then remains beneath every chapter. */
-.v2-global-tree { position: fixed; z-index: 0; inset: 0 var(--v2-rail); overflow: hidden; pointer-events: none; opacity: .53; animation: v21-tree-arrive 2.05s ease-out both; }
-.v2-global-tree img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
-.v2-tree-depth { transform-origin: 50% 70%; }
-.v2-tree-far { opacity: .36; animation: v21-tree-far 64s ease-in-out infinite alternate; }
-.v2-tree-middle { opacity: .58; animation: v21-tree-middle 57s ease-in-out infinite alternate; }
-.v2-tree-near { opacity: .88; animation: v21-tree-near 53s ease-in-out infinite alternate; }
-@keyframes v21-tree-arrive { 0% { opacity: .88; filter: blur(1px); } 30% { opacity: 1; filter: blur(0); } 66% { opacity: .72; } 100% { opacity: .53; } }
+/* The glyph canvas sits above chapter surfaces and below their content frames. */
+.v2-global-tree { position: fixed; z-index: 1; inset: 0; overflow: hidden; pointer-events: none; }
+.v2-global-tree canvas, .v2-global-tree .v22-tree-fallback, .v2-global-tree .v22-tree-noscript { position: absolute; inset: 0; width: 100%; height: 100%; }
+.v2-global-tree canvas, .v2-global-tree .v22-tree-noscript { display: block; }
+.v2-global-tree .v22-tree-fallback, .v2-global-tree .v22-tree-noscript { object-fit: cover; opacity: .55; }
+.v2-global-tree .v22-tree-fallback { display: none; }
+.v2-global-tree[data-tree-phase="pending"] .v22-tree-fallback { display: block; opacity: .32; clip-path: inset(0 42% 0 42%); }
+.v2-global-tree[data-tree-phase="fallback"] .v22-tree-fallback { display: block; }
+.v2-hero-statement { background: linear-gradient(90deg, rgba(235,232,226,.96), rgba(235,232,226,.80)); padding: 7px 10px 7px 0; }
 @keyframes v21-hero-paper { 0% { background: rgba(233,230,223,.08); } 30% { background: rgba(233,230,223,.25); } 100% { background: rgba(233,230,223,.68); } }
-@keyframes v21-tree-far { from { transform: translate3d(-14px, 0, 0) scale(.97) rotateY(-5deg); } to { transform: translate3d(16px, -13px, 0) scale(1.02) rotateY(5deg); } }
-@keyframes v21-tree-middle { from { transform: translate3d(9px, -8px, 0) scale(1.015) rotateY(3deg); } to { transform: translate3d(-13px, 8px, 0) scale(.987) rotateY(-3deg); } }
-@keyframes v21-tree-near { from { transform: translate3d(18px, 12px, 0) scale(1.02) rotateY(4deg); } to { transform: translate3d(-17px, -9px, 0) scale(.985) rotateY(-4deg); } }
 .v2-hero .v2-frame { animation: v21-page-arrive .6s 1.4s ease-out both; }
 .v2-hero { animation: v21-hero-paper 2.05s ease-out both; }
 .v2-hero .v2-pattern { animation: v21-page-arrive .55s 1.45s ease-out both; }
@@ -550,8 +549,7 @@ body:has(.v2-home) .site-footer { display: none; }
 .v2-education-art img { filter: drop-shadow(0 19px 35px rgba(0,0,0,.16)); }
 
 @media (max-width: 700px) {
-  .v2-global-tree { opacity: .4; }
-  .v2-global-tree img { width: 260%; max-width: none; left: -80%; }
+  .v2-global-tree :is(.v22-tree-fallback, .v22-tree-noscript) { width: 260%; max-width: none; left: -80%; }
   .v21-language-switch { top: 56px; right: calc(var(--v2-rail) + 8px); }
   .v21-language-switch button { min-width: 49px; min-height: 44px; font-size: 12px; padding: 0 6px; }
   .v21-language-switch--dialog { position: static; }
@@ -574,8 +572,7 @@ body:has(.v2-home) .site-footer { display: none; }
   .v2-education-art > span { left: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .v2-global-tree { opacity: .53; filter: none; }
-  .v2-tree-depth, .v21-gallery-track { animation: none !important; transform: none !important; }
+  .v21-gallery-track { animation: none !important; transform: none !important; }
   .v21-gallery-track--echo, .v21-gallery-set[aria-hidden="true"] { display: none; }
   .v21-gallery-window { scrollbar-width: thin; }
 }
