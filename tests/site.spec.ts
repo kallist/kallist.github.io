@@ -249,7 +249,11 @@ test("visible language switch translates key sections and chapter navigation", a
     await expect(page.getByRole("dialog", { name: "章节" }).getByRole("link", { name: /视觉创作/ })).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(trigger).toBeFocused();
-    await switcher.getByRole("button", { name: "EN" }).focus();
+    await page.locator("#hero").scrollIntoViewIfNeeded();
+    const english = switcher.getByRole("button", { name: "EN" });
+    await expect(english).toBeVisible();
+    await english.focus();
+    await expect(english).toBeFocused();
     await page.keyboard.press("Enter");
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
     await expect(page.locator("#work-title")).toContainText("Selected work");
