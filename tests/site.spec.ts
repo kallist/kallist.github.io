@@ -111,6 +111,7 @@ test("pointer shifts character fields while reduced motion keeps them still", as
 });
 
 test("body words and display text have hover feedback, and homepage images load", async ({ page }) => {
+  test.setTimeout(60_000);
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   const word = page.locator(".v2-hero-statement .v2-word").first();
@@ -126,23 +127,30 @@ test("body words and display text have hover feedback, and homepage images load"
     await image.scrollIntoViewIfNeeded();
     await expect.poll(() => image.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0)).toBe(true);
   }
+  const galleryWindow = page.locator(".v21-gallery-window");
+  await galleryWindow.scrollIntoViewIfNeeded();
+  await galleryWindow.hover();
   for (const image of await page.locator(".v21-gallery-set:not([aria-hidden]) img").all()) {
-    await expect.poll(() => image.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0)).toBe(true);
+    await image.scrollIntoViewIfNeeded();
+    await expect.poll(() => image.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0), { timeout: 10_000 }).toBe(true);
   }
 });
 
-test("visual practice is a data-driven, draggable four-work band with a motion control", async ({
+test("visual practice is a data-driven, draggable five-work band with a motion control", async ({
   page,
 }) => {
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
     const gallery = page.locator(".v21-gallery");
-    await expect(gallery).toHaveAttribute("data-gallery-count", "4");
+    await expect(gallery).toHaveAttribute("data-gallery-count", "5");
     const images = gallery.locator(".v21-gallery-track--main .v21-gallery-set:not([aria-hidden]) img");
-    await expect(images).toHaveCount(4);
-    expect(new Set(await images.evaluateAll((nodes) => nodes.map((node) => (node as HTMLImageElement).src))).size).toBe(4);
-    await expect(gallery.locator(".v21-gallery-track--main .v21-gallery-set[aria-hidden='true']")).toHaveCount(1);
+    await expect(images).toHaveCount(5);
+    expect(new Set(await images.evaluateAll((nodes) => nodes.map((node) => (node as HTMLImageElement).src))).size).toBe(5);
+    await expect(images.nth(4)).toHaveAttribute("src", /\/gallery\/riverside-ink\.webp$/);
+    const riverside = gallery.locator(".v21-gallery-track--main .v21-gallery-set:not([aria-hidden]) .v21-gallery-item").nth(4);
+    expect(await riverside.locator("img").evaluate((node) => getComputedStyle(node).objectFit)).toBe("contain");
+    await expect(gallery.locator(".v21-gallery-track--main .v21-gallery-set[aria-hidden='true']")).toHaveCount(2);
     await expect(gallery.getByRole("button", { name: "Pause motion" })).toBeVisible();
     await gallery.getByRole("button", { name: "Pause motion" }).click();
     await expect(gallery).toHaveAttribute("data-paused", "true");
@@ -167,7 +175,7 @@ test("ASCII tree stays behind readable content and becomes static in reduced mot
   await page.goto("/");
   const tree = page.locator("[data-global-ascii-tree]");
   await expect(tree).toHaveCount(1);
-  await expect(tree.locator("img")).toHaveCount(2);
+  await expect(tree.locator("img")).toHaveCount(3);
   for (const image of await tree.locator("img").all()) {
     expect(await image.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0)).toBe(true);
   }
@@ -178,7 +186,80 @@ test("ASCII tree stays behind readable content and becomes static in reduced mot
   await page.emulateMedia({ reducedMotion: "reduce" });
   expect(await tree.locator(".v2-tree-near").evaluate((node) => getComputedStyle(node).animationName)).toBe("none");
   expect(await page.locator(".v21-gallery-track--main").evaluate((node) => getComputedStyle(node).animationName)).toBe("none");
-  await expect(page.locator(".v21-gallery-track--main .v21-gallery-set:not([aria-hidden]) img")).toHaveCount(4);
+  await expect(page.locator(".v21-gallery-track--main .v21-gallery-set:not([aria-hidden]) img")).toHaveCount(5);
+  const projectImage = page.locator(".v2-repo-media img");
+  await projectImage.scrollIntoViewIfNeeded();
+  await expect.poll(() => projectImage.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0)).toBe(true);
+  await expect(page.locator(".v2-repo-media")).toHaveClass(/v2-in-view/);
+  await expect.poll(() => page.locator(".v2-repo-media").evaluate((node) => getComputedStyle(node).clipPath)).toBe("inset(0px)");
+  const box = await projectImage.boundingBox();
+  if (!box) throw new Error("Project image has no bounds");
+  // The translucent 1px border intentionally reveals its background; compare
+  // the opaque image interior to catch glyphs painted across the screenshot.
+  const interior = { x: box.x + 2, y: box.y + 2, width: box.width - 4, height: box.height - 4 };
+  const withTree = await page.screenshot({ clip: interior });
+  await tree.evaluate((node: HTMLElement) => { node.style.visibility = "hidden"; });
+  expect(withTree.equals(await page.screenshot({ clip: interior }))).toBe(true);
+});
+
+test("tree arrives before hero and remains fixed through the final chapter", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  const tree = page.locator("[data-global-ascii-tree]");
+  const hero = page.locator(".v2-hero .v2-frame");
+  const early = await page.evaluate(() => {
+    const tree = document.querySelector(".v2-global-tree")!;
+    const hero = document.querySelector(".v2-hero .v2-frame")!;
+    const treeAnimation = tree.getAnimations()[0];
+    const heroAnimation = hero.getAnimations()[0];
+    if (!treeAnimation || !heroAnimation) throw new Error("Intro timeline is missing");
+    treeAnimation.pause();
+    heroAnimation.pause();
+    treeAnimation.currentTime = 500;
+    heroAnimation.currentTime = 500;
+    return { tree: Number.parseFloat(getComputedStyle(tree).opacity), hero: Number.parseFloat(getComputedStyle(hero).opacity) };
+  });
+  expect(early.tree).toBeGreaterThan(early.hero);
+  await page.evaluate(() => {
+    document.querySelector(".v2-global-tree")!.getAnimations()[0].finish();
+    document.querySelector(".v2-hero .v2-frame")!.getAnimations()[0].finish();
+  });
+  await expect(hero).toHaveCSS("opacity", "1");
+  await page.locator("#contact").scrollIntoViewIfNeeded();
+  await expect(tree).toBeInViewport();
+  expect(await tree.evaluate((node) => getComputedStyle(node).position)).toBe("fixed");
+});
+
+test("visible language switch translates key sections and chapter navigation", async ({ page }) => {
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const switcher = page.getByRole("group", { name: "Language / 语言" }).first();
+    await expect(switcher).toBeInViewport();
+    await expect(switcher.getByRole("button", { name: "EN" })).toHaveAttribute("aria-pressed", "true");
+    await switcher.getByRole("button", { name: "中文" }).click();
+    await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("kallist.");
+    await expect(page.locator("#work-title")).toContainText("精选项目");
+    await expect(page.locator("#profile-title")).toContainText("构建它");
+    await expect(page.locator("#visual-title")).toContainText("线条仍在");
+    await expect(page.locator(".v21-gallery")).toContainText("彩色角色插画");
+    const trigger = page.getByRole("button", { name: "打开章节导航" });
+    await trigger.click();
+    await expect(page.getByRole("dialog", { name: "章节" }).getByRole("link", { name: /视觉创作/ })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(trigger).toBeFocused();
+    await page.locator("#hero").scrollIntoViewIfNeeded();
+    const english = switcher.getByRole("button", { name: "EN" });
+    await expect(english).toBeVisible();
+    await english.focus();
+    await expect(english).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(page.locator("html")).toHaveAttribute("lang", "en");
+    await expect(page.locator("#work-title")).toContainText("Selected work");
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(1);
+  }
 });
 
 test("case studies deep load with real evidence links and honest captions", async ({
@@ -255,6 +336,14 @@ test("mobile and tablet layouts stay within viewport, with touch navigation", as
     await expect(
       page.getByRole("heading", { name: /Repo\s*Bound/, level: 3 }),
     ).toBeVisible();
+    if (width <= 430) {
+      const title = page.locator("#repobound-title");
+      const edges = await title.evaluate((node) => ({
+        title: node.getBoundingClientRect().right,
+        lastWord: node.querySelector(".v2-word:last-child")?.getBoundingClientRect().right ?? Infinity,
+      }));
+      expect(edges.lastWord, `RepoBound title clipped at ${width}px`).toBeLessThanOrEqual(edges.title + 1);
+    }
     await page.getByRole("button", { name: "Open chapter navigation" }).click();
     await expect(page.getByRole("navigation", { name: "Chapter navigation" }).getByRole("link", { name: /Resume/ })).toBeVisible();
     await page

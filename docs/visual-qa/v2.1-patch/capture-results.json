@@ -1,0 +1,32 @@
+{
+  "url": "http://127.0.0.1:4173/",
+  "results": [
+    {
+      "introTreeOpacity": "0.765965",
+      "introHeroOpacity": "0"
+    },
+    {
+      "emergeTreeOpacity": "0.622159",
+      "emergeHeroOpacity": "0.488349"
+    },
+    {
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "galleryMotion": {
+        "before": "matrix(1, 0, 0, 1, -207.337, 0)",
+        "after": "matrix(1, 0, 0, 1, -242.797, 0)",
+        "changed": true
+      }
+    },
+    {
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "width": 390,
+      "overflow": 0
+    }
+  ]
+}

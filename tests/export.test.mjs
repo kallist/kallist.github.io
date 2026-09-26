@@ -32,6 +32,7 @@ test("export contains the real portrait, pinned project images and SEO files", (
     "gallery/birthday-ink.webp",
     "gallery/comic-two-panel.webp",
     "gallery/comic-triptych.webp",
+    "gallery/riverside-ink.webp",
     "projects/repobound-hero.png",
     "projects/cueparcel-lens.png",
     "projects/agent-studio-trace.png",
@@ -100,10 +101,10 @@ test("exported homepage includes factual Chinese education and the character gat
   assert.doesNotMatch(home, /Detail 01|Detail 02/);
 });
 
-test("exported visual practice identifies four distinct supplied works", () => {
+test("exported visual practice identifies five documented works", () => {
   const home = readFileSync(join(root, "index.html"), "utf8");
-  assert.match(home, /data-gallery-count="4"/);
-  for (const name of ["birthday-color", "birthday-ink", "comic-two-panel", "comic-triptych"]) {
+  assert.match(home, /data-gallery-count="5"/);
+  for (const name of ["birthday-color", "birthday-ink", "comic-two-panel", "comic-triptych", "riverside-ink"]) {
     assert.match(home, new RegExp(`gallery/${name}\\.webp`));
   }
 });
