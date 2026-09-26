@@ -5,7 +5,7 @@ export type GalleryWork = {
   caption: string;
   captionZh: string;
   altZh: string;
-  shape: "landscape" | "portrait";
+  shape: "landscape" | "portrait" | "wide";
   scale: "anchor" | "standard" | "sample";
   width: number;
   height: number;
@@ -63,15 +63,15 @@ export const galleryWorks: readonly GalleryWork[] = [
     height: 1179,
   },
   {
-    id: "self-portrait",
-    src: "/portrait/self-portrait.webp",
-    alt: "Original black-and-white manga self portrait with fragmented ink strokes, also shown in the hero",
-    altZh: "带有碎片化墨线的原创黑白漫画自画像；首页 Hero 也展示了同一幅画",
-    caption: "Original self portrait · also in Hero",
-    captionZh: "原创自画像 · Hero 同幅作品",
-    shape: "landscape",
+    id: "riverside-ink",
+    src: "/gallery/riverside-ink.webp",
+    alt: "Monochrome illustration of a long-haired character reaching toward ripples in a river",
+    altZh: "长发角色俯身触碰河面涟漪的黑白插画",
+    caption: "Riverside character illustration",
+    captionZh: "河畔角色插画",
+    shape: "wide",
     scale: "anchor",
-    width: 1448,
-    height: 1086,
+    width: 1916,
+    height: 821,
   },
 ];

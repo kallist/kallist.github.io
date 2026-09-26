@@ -38,6 +38,18 @@ try {
     }
     await page.waitForTimeout(2200);
     if (width === 1440) await capture(page, "hero-complete-1440.png");
+    // A full-page capture alone does not load below-fold images or finish
+    // scroll-triggered reveals. Walk the actual page first.
+    await page.evaluate(async () => {
+      document.documentElement.style.scrollBehavior = "auto";
+      for (let y = 0; y < document.documentElement.scrollHeight; y += window.innerHeight * .8) {
+        window.scrollTo({ top: y, behavior: "instant" });
+        await new Promise((resolve) => setTimeout(resolve, 85));
+      }
+      window.scrollTo({ top: 0, behavior: "instant" });
+    });
+    await page.waitForFunction(() => [...document.querySelectorAll(".v2-case-media img")].every((image) => image.complete && image.naturalWidth > 0));
+    await page.waitForTimeout(900);
     await capture(page, `full-${width}.png`, true);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     results.push({ width, overflow });
@@ -52,6 +64,9 @@ try {
       const after = await track.evaluate((node) => getComputedStyle(node).transform);
       await page.locator("#visual").screenshot({ path: fileURLToPath(new URL("gallery-motion-1440.png", directory)) });
       results.push({ galleryMotion: { before, after, changed: before !== after } });
+      await page.getByRole("button", { name: "Pause motion" }).click();
+      await page.locator(".v21-gallery-track--main .v21-gallery-set:not([aria-hidden]) .v21-gallery-item").nth(4).scrollIntoViewIfNeeded();
+      await page.locator("#visual").screenshot({ path: fileURLToPath(new URL("gallery-05-1440.png", directory)) });
       await page.locator("#work").scrollIntoViewIfNeeded();
       await page.waitForTimeout(750);
       await capture(page, "tree-with-work-1440.png");
