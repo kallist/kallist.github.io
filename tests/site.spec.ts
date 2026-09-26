@@ -175,16 +175,30 @@ test("ASCII tree stays behind readable content and becomes static in reduced mot
   await page.goto("/");
   const tree = page.locator("[data-global-ascii-tree]");
   await expect(tree).toHaveCount(1);
-  await expect(tree.locator("img")).toHaveCount(3);
-  for (const image of await tree.locator("img").all()) {
-    expect(await image.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0)).toBe(true);
-  }
+  await expect(tree.locator("canvas[data-living-ascii-tree]")).toHaveCount(1);
+  await expect.poll(() => tree.getAttribute("data-glyph-count")).not.toBeNull();
+  expect(Number(await tree.getAttribute("data-glyph-count"))).toBeGreaterThan(5000);
+  await expect.poll(() => tree.locator("canvas").evaluate((node: HTMLCanvasElement) => {
+    const context = node.getContext("2d")!;
+    const pixels = context.getImageData(0, 0, node.width, node.height).data;
+    for (let index = 3; index < pixels.length; index += 4) if (pixels[index] > 0) return true;
+    return false;
+  })).toBe(true);
+  await expect(tree).toHaveAttribute("data-tree-phase", "ready", { timeout: 5000 });
+  const livingCanvas = tree.locator("canvas");
+  const motionFrame = await livingCanvas.evaluate((node: HTMLCanvasElement) => node.toDataURL());
+  await page.waitForTimeout(600);
+  expect(await livingCanvas.evaluate((node: HTMLCanvasElement) => node.toDataURL())).not.toBe(motionFrame);
   expect(await tree.evaluate((node) => getComputedStyle(node).position)).toBe("fixed");
   expect(await tree.evaluate((node) => getComputedStyle(node).pointerEvents)).toBe("none");
   await page.locator("#work").scrollIntoViewIfNeeded();
   await expect(page.getByRole("link", { name: /Explore case study/i }).first()).toBeVisible();
   await page.emulateMedia({ reducedMotion: "reduce" });
-  expect(await tree.locator(".v2-tree-near").evaluate((node) => getComputedStyle(node).animationName)).toBe("none");
+  await expect(tree).toHaveAttribute("data-tree-motion", "static");
+  await expect(tree).toHaveAttribute("data-tree-phase", "ready");
+  const staticFrame = await livingCanvas.evaluate((node: HTMLCanvasElement) => node.toDataURL());
+  await page.waitForTimeout(150);
+  expect(await livingCanvas.evaluate((node: HTMLCanvasElement) => node.toDataURL())).toBe(staticFrame);
   expect(await page.locator(".v21-gallery-track--main").evaluate((node) => getComputedStyle(node).animationName)).toBe("none");
   await expect(page.locator(".v21-gallery-track--main .v21-gallery-set:not([aria-hidden]) img")).toHaveCount(5);
   const projectImage = page.locator(".v2-repo-media img");
@@ -197,37 +211,88 @@ test("ASCII tree stays behind readable content and becomes static in reduced mot
   // The translucent 1px border intentionally reveals its background; compare
   // the opaque image interior to catch glyphs painted across the screenshot.
   const interior = { x: box.x + 2, y: box.y + 2, width: box.width - 4, height: box.height - 4 };
-  const withTree = await page.screenshot({ clip: interior });
+  const withTree = await page.screenshot({ clip: interior, animations: "disabled" });
   await tree.evaluate((node: HTMLElement) => { node.style.visibility = "hidden"; });
-  expect(withTree.equals(await page.screenshot({ clip: interior }))).toBe(true);
+  expect(withTree.equals(await page.screenshot({ clip: interior, animations: "disabled" }))).toBe(true);
 });
 
 test("tree arrives before hero and remains fixed through the final chapter", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
+  await page.addInitScript(() => {
+    const timeline = { firstGlyph: 0, heroStart: 0 };
+    (window as unknown as { __treeTimeline: typeof timeline }).__treeTimeline = timeline;
+    const original = CanvasRenderingContext2D.prototype.fillText;
+    CanvasRenderingContext2D.prototype.fillText = function (...args) {
+      if (!timeline.firstGlyph && this.canvas.matches("[data-living-ascii-tree]")) timeline.firstGlyph = performance.now();
+      return original.apply(this, args);
+    };
+    document.addEventListener("animationstart", (event) => {
+      if (!timeline.heroStart && event.target instanceof Element && event.target.matches(".v2-hero .v2-frame")) timeline.heroStart = performance.now();
+    });
+  });
   await page.goto("/", { waitUntil: "domcontentloaded" });
   const tree = page.locator("[data-global-ascii-tree]");
   const hero = page.locator(".v2-hero .v2-frame");
-  const early = await page.evaluate(() => {
-    const tree = document.querySelector(".v2-global-tree")!;
-    const hero = document.querySelector(".v2-hero .v2-frame")!;
-    const treeAnimation = tree.getAnimations()[0];
-    const heroAnimation = hero.getAnimations()[0];
-    if (!treeAnimation || !heroAnimation) throw new Error("Intro timeline is missing");
-    treeAnimation.pause();
-    heroAnimation.pause();
-    treeAnimation.currentTime = 500;
-    heroAnimation.currentTime = 500;
-    return { tree: Number.parseFloat(getComputedStyle(tree).opacity), hero: Number.parseFloat(getComputedStyle(hero).opacity) };
-  });
-  expect(early.tree).toBeGreaterThan(early.hero);
-  await page.evaluate(() => {
-    document.querySelector(".v2-global-tree")!.getAnimations()[0].finish();
-    document.querySelector(".v2-hero .v2-frame")!.getAnimations()[0].finish();
-  });
+  await expect(tree).toHaveAttribute("data-tree-phase", "ready", { timeout: 5000 });
   await expect(hero).toHaveCSS("opacity", "1");
+  const timeline = await page.evaluate(() => (window as unknown as { __treeTimeline: { firstGlyph: number; heroStart: number } }).__treeTimeline);
+  expect(timeline.firstGlyph).toBeGreaterThan(0);
+  expect(timeline.heroStart).toBeGreaterThan(timeline.firstGlyph);
   await page.locator("#contact").scrollIntoViewIfNeeded();
   await expect(tree).toBeInViewport();
   expect(await tree.evaluate((node) => getComputedStyle(node).position)).toBe("fixed");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
+});
+
+test("living tree changes to pale glyphs over dark chapters", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const tree = page.locator("[data-global-ascii-tree]");
+  await expect(tree).toHaveAttribute("data-tree-motion", "static");
+  const paleBefore = await tree.locator("canvas").evaluate((node: HTMLCanvasElement) => node.toDataURL());
+  for (const selector of [".v2-cue-scene", "#education", "#contact"]) {
+    await page.locator(selector).evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      window.scrollTo(0, window.scrollY + rect.top + rect.height / 2 - window.innerHeight / 2);
+    });
+    await expect(tree).toHaveAttribute("data-tree-palette", "light");
+    expect(await tree.locator("canvas").evaluate((node: HTMLCanvasElement) => node.toDataURL())).not.toBe(paleBefore);
+    if (selector === ".v2-cue-scene") {
+      await page.getByRole("button", { name: "Open chapter navigation" }).click();
+      await page.evaluate(() => window.dispatchEvent(new Event("scroll")));
+      await expect(tree).toHaveAttribute("data-tree-palette", "light");
+      await page.keyboard.press("Escape");
+    }
+  }
+});
+
+test("tree canvas resizes with capped DPR and pauses on hidden visibility", async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 });
+  const page = await context.newPage();
+  await page.goto("/");
+  const tree = page.locator("[data-global-ascii-tree]");
+  const canvas = tree.locator("canvas");
+  await expect(tree).toHaveAttribute("data-tree-motion", "running");
+  await expect.poll(() => canvas.evaluate((node: HTMLCanvasElement) => [node.width, node.height])).toEqual([2160, 1350]);
+  const desktopCount = Number(await tree.getAttribute("data-glyph-count"));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect.poll(() => canvas.evaluate((node: HTMLCanvasElement) => [node.width, node.height])).toEqual([488, 1055]);
+  expect(Number(await tree.getAttribute("data-glyph-count"))).toBeLessThan(desktopCount);
+  await page.evaluate(() => {
+    Object.defineProperty(document, "visibilityState", { configurable: true, get: () => "hidden" });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await expect(tree).toHaveAttribute("data-tree-motion", "paused");
+  const pausedFrame = await canvas.evaluate((node: HTMLCanvasElement) => node.toDataURL());
+  await page.waitForTimeout(180);
+  expect(await canvas.evaluate((node: HTMLCanvasElement) => node.toDataURL())).toBe(pausedFrame);
+  await page.evaluate(() => {
+    Reflect.deleteProperty(document, "visibilityState");
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await expect(tree).toHaveAttribute("data-tree-motion", "running");
+  await context.close();
 });
 
 test("visible language switch translates key sections and chapter navigation", async ({ page }) => {
@@ -286,6 +351,8 @@ test("case studies deep load with real evidence links and honest captions", asyn
     await expect(page.getByText(/Boundary\./)).toBeVisible();
   }
   await page.goto("/work/skin-lesion-ai/");
+  await page.reload();
+  await expect(page.locator("h1")).toBeVisible();
   await expect(page.getByText("78.54%", { exact: true })).toBeVisible();
   await expect(page.getByText("65.49%", { exact: true })).toBeVisible();
   await expect(

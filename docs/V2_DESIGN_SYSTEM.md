@@ -1,5 +1,7 @@
 # Kallist V2 design system
 
+This document records the V2 foundation. V2.2 replaces the static layered background tree; see [living tree design](V22_LIVING_TREE_DESIGN.md) and [visual review](V22_LIVING_TREE_REVIEW.md).
+
 ## Composition
 
 - Fixed 68px rails on desktop, 48px on tablet and 30px on mobile. Tick patterns, reading progress and active chapter markers are CSS and DOM, never images.
