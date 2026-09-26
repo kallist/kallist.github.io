@@ -3,6 +3,7 @@ type Props = {
   src: string;
   alt: string;
   caption: string;
+  linkLabel?: string;
   className?: string;
   priority?: boolean;
 };
@@ -20,6 +21,7 @@ export function ProjectImage({
   src,
   alt,
   caption,
+  linkLabel = "Open full image",
   className = "",
   priority = false,
 }: Props) {
@@ -38,7 +40,7 @@ export function ProjectImage({
       <figcaption>
         {caption}{" "}
         <a href={src} target="_blank" rel="noopener noreferrer">
-          Open full image ↗
+          {linkLabel} ↗
         </a>
       </figcaption>
     </figure>

@@ -100,10 +100,11 @@ test("exported homepage includes factual Chinese education and the character gat
   assert.doesNotMatch(home, /Detail 01|Detail 02/);
 });
 
-test("exported visual practice identifies four distinct supplied works", () => {
+test("exported visual practice identifies five documented works", () => {
   const home = readFileSync(join(root, "index.html"), "utf8");
-  assert.match(home, /data-gallery-count="4"/);
+  assert.match(home, /data-gallery-count="5"/);
   for (const name of ["birthday-color", "birthday-ink", "comic-two-panel", "comic-triptych"]) {
     assert.match(home, new RegExp(`gallery/${name}\\.webp`));
   }
+  assert.match(home, /portrait\/self-portrait\.webp/);
 });
