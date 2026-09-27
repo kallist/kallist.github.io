@@ -127,16 +127,16 @@ test("body words and display text have hover feedback, and homepage images load"
     await image.scrollIntoViewIfNeeded();
     await expect.poll(() => image.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0)).toBe(true);
   }
-  const galleryWindow = page.locator(".v21-gallery-window");
+  const galleryWindow = page.locator(".v21-exhibition-window");
   await galleryWindow.scrollIntoViewIfNeeded();
   await galleryWindow.hover();
-  for (const image of await page.locator(".v21-gallery-set:not([aria-hidden]) img").all()) {
+  for (const image of await page.locator(".v21-exhibition-item:not([aria-hidden]) img").all()) {
     await image.scrollIntoViewIfNeeded();
     await expect.poll(() => image.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0), { timeout: 10_000 }).toBe(true);
   }
 });
 
-test("desktop visual practice retains its data-driven five-work band and motion control", async ({
+test("desktop and tablet share the continuous exhibition with a dominant work and motion control", async ({
   page,
 }) => {
   for (const width of [1440, 768]) {
@@ -144,20 +144,45 @@ test("desktop visual practice retains its data-driven five-work band and motion 
     await page.goto("/");
     const gallery = page.locator(".v21-gallery");
     await expect(gallery).toHaveAttribute("data-gallery-count", "5");
-    const images = gallery.locator(".v21-gallery-track--main .v21-gallery-set:not([aria-hidden]) img");
+    const images = gallery.locator(".v21-exhibition-item:not([aria-hidden]) img");
     await expect(images).toHaveCount(5);
     expect(new Set(await images.evaluateAll((nodes) => nodes.map((node) => (node as HTMLImageElement).src))).size).toBe(5);
     await expect(images.nth(4)).toHaveAttribute("src", /\/gallery\/riverside-ink\.webp$/);
-    const riverside = gallery.locator(".v21-gallery-track--main .v21-gallery-set:not([aria-hidden]) .v21-gallery-item").nth(4);
+    const riverside = gallery.locator(".v21-exhibition-item:not([aria-hidden])").nth(4);
     expect(await riverside.locator("img").evaluate((node) => getComputedStyle(node).objectFit)).toBe("contain");
-    await expect(gallery.locator(".v21-gallery-track--main .v21-gallery-set[aria-hidden='true']")).toHaveCount(2);
+    await expect(gallery.locator(".v21-exhibition-item")).toHaveCount(15);
+    await expect(gallery.locator('.v21-exhibition-item[data-prominence="active"]')).toHaveCount(1);
+    await expect(gallery.locator('.v21-exhibition-item[data-prominence="near"]')).toHaveCount(2);
+    const hierarchy = await gallery.locator('.v21-exhibition-item[data-prominence="active"]').evaluate((active) => {
+      const near = document.querySelector<HTMLElement>('.v21-exhibition-item[data-prominence="near"]')!;
+      return { active: active.getBoundingClientRect().width, near: near.getBoundingClientRect().width };
+    });
+    expect(hierarchy.active).toBeGreaterThan(hierarchy.near * 1.4);
+    const viewport = gallery.locator(".v21-exhibition-window");
+    await viewport.scrollIntoViewIfNeeded();
+    await viewport.hover();
+    await page.waitForTimeout(650);
+    const positions = await viewport.evaluate((window) => {
+      const active = window.querySelector<HTMLElement>('.v21-exhibition-item[data-prominence="active"]')!;
+      const near = Array.from(window.querySelectorAll<HTMLElement>('.v21-exhibition-item[data-prominence="near"]'));
+      const center = window.getBoundingClientRect().left + window.clientWidth / 2;
+      return { offset: Math.abs(active.getBoundingClientRect().left + active.getBoundingClientRect().width / 2 - center), leftVisible: near.some((item) => item.getBoundingClientRect().right > 30 && item.getBoundingClientRect().left < center), rightVisible: near.some((item) => item.getBoundingClientRect().left < innerWidth - 30 && item.getBoundingClientRect().right > center) };
+    });
+    expect(positions.offset).toBeLessThan(25);
+    expect(positions.leftVisible).toBe(true);
+    expect(positions.rightVisible).toBe(true);
+    await page.mouse.move(10, 10);
+    const movingFrom = await viewport.evaluate((node) => node.scrollLeft);
+    await expect.poll(() => viewport.evaluate((node) => node.scrollLeft), { timeout: 2_000 }).toBeGreaterThan(movingFrom + 2);
     await expect(gallery.getByRole("button", { name: "Pause motion" })).toBeVisible();
     await gallery.getByRole("button", { name: "Pause motion" }).click();
     await expect(gallery).toHaveAttribute("data-paused", "true");
+    const pausedAt = await viewport.evaluate((node) => node.scrollLeft);
+    await page.waitForTimeout(300);
+    expect(Math.abs((await viewport.evaluate((node) => node.scrollLeft)) - pausedAt)).toBeLessThan(2);
     await gallery.getByRole("button", { name: "Resume motion" }).click();
     await expect(gallery).toHaveAttribute("data-paused", "false");
-    await gallery.locator(".v21-gallery-window").scrollIntoViewIfNeeded();
-    const viewport = gallery.locator(".v21-gallery-window");
+    await viewport.hover();
     const before = await viewport.evaluate((node) => node.scrollLeft);
     const box = await viewport.boundingBox();
     if (!box) throw new Error("Gallery window has no bounds");
@@ -170,29 +195,42 @@ test("desktop visual practice retains its data-driven five-work band and motion 
   }
 });
 
-test("mobile visual practice has one snap reel, unique works, connected captions and live position", async ({ page }) => {
+test("desktop exhibition wraps between the last and first work without a visible end", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const gallery = page.locator(".v21-gallery");
+  await gallery.locator(".v21-exhibition-window").scrollIntoViewIfNeeded();
+  await gallery.getByRole("button", { name: "Previous artwork" }).click();
+  await expect(gallery).toHaveAttribute("data-active-index", "5");
+  await expect.poll(() => gallery.locator('.v21-exhibition-item[data-prominence="active"]').getAttribute("data-gallery-slot")).toBe("9");
+  await gallery.getByRole("button", { name: "Next artwork" }).click();
+  await expect(gallery).toHaveAttribute("data-active-index", "1");
+  await expect.poll(() => gallery.locator('.v21-exhibition-item[data-prominence="active"]').getAttribute("data-gallery-slot")).toBe("5");
+});
+
+test("mobile shares the reel data and shows one snapped work with connected metadata", async ({ page }) => {
   for (const width of [360, 375, 390, 430]) {
     await page.setViewportSize({ width, height: 844 });
     await page.goto("/");
     const gallery = page.locator(".v21-gallery");
-    const reel = gallery.locator(".v21-gallery-mobile-window");
+    const reel = gallery.locator(".v21-exhibition-window");
     await reel.scrollIntoViewIfNeeded();
     await expect(reel).toBeVisible();
-    await expect(gallery.locator(".v21-gallery-window")).toBeHidden();
-    await expect(gallery.locator(".v21-gallery-track--echo")).toBeHidden();
-    const works = gallery.locator(".v21-gallery-mobile-item:not([data-clone])");
+    await expect(gallery.locator(".v21-gallery-track--echo")).toHaveCount(0);
+    const works = gallery.locator(".v21-exhibition-item:not([aria-hidden])");
     await expect(works).toHaveCount(5);
     expect(new Set(await works.locator("img").evaluateAll((nodes) => nodes.map((node) => (node as HTMLImageElement).src))).size).toBe(5);
-    await expect(gallery.locator(".v21-gallery-mobile-item[data-clone]" )).toHaveCount(2);
-    await expect(gallery.locator(".v21-gallery-mobile-controls > span").first()).toHaveText("01 / 05");
+    await expect(gallery.locator(".v21-exhibition-item[aria-hidden='true']")).toHaveCount(10);
+    await expect(gallery.locator(".v21-gallery-bottomline > span").first()).toHaveText("01 / 05");
     expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
     const metrics = await works.first().evaluate((node) => ({ width: node.getBoundingClientRect().width, viewport: innerWidth, fit: getComputedStyle(node.querySelector("img")!).objectFit }));
     expect(metrics.width).toBeGreaterThan((metrics.viewport - 60) * .77);
     expect(metrics.width).toBeLessThan((metrics.viewport - 60) * .84);
     expect(metrics.fit).toBe("contain");
     const composition = await reel.evaluate((window) => {
-      const work = window.querySelector<HTMLElement>('.v21-gallery-mobile-item[data-index="0"]:not([data-clone])')!;
-      const next = window.querySelector<HTMLElement>('.v21-gallery-mobile-item[data-index="1"]:not([data-clone])')!;
+      const work = window.querySelector<HTMLElement>('.v21-exhibition-item[data-gallery-slot="5"]')!;
+      const next = window.querySelector<HTMLElement>('.v21-exhibition-item[data-gallery-slot="6"]')!;
       const centered = Math.abs(work.getBoundingClientRect().left + work.clientWidth / 2 - innerWidth / 2);
       const peek = innerWidth - 30 - next.getBoundingClientRect().left;
       return { centered, peek, usable: innerWidth - 60 };
@@ -205,12 +243,12 @@ test("mobile visual practice has one snap reel, unique works, connected captions
       expect((await page.request.get(new URL(src!, page.url()).href)).ok()).toBe(true);
     }
     await gallery.getByRole("button", { name: "Next artwork" }).click();
-    await expect(gallery.locator(".v21-gallery-mobile-controls > span").first()).toHaveText("02 / 05");
+    await expect(gallery.locator(".v21-gallery-bottomline > span").first()).toHaveText("02 / 05");
     await reel.focus();
     await page.keyboard.press("ArrowRight");
-    await expect(gallery.locator(".v21-gallery-mobile-controls > span").first()).toHaveText("03 / 05");
+    await expect(gallery.locator(".v21-gallery-bottomline > span").first()).toHaveText("03 / 05");
     await expect(works.nth(2)).toContainText("Two-panel character sequence");
-    await expect(gallery.locator(".v21-gallery-mobile-controls")).not.toContainText(/Pause motion|Resume motion/);
+    await expect(gallery.getByRole("button", { name: "Pause motion" })).toBeHidden();
   }
 });
 
@@ -219,18 +257,18 @@ test("mobile reel wraps at both ends and remains manually swipable in reduced mo
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const gallery = page.locator(".v21-gallery");
-  const reel = gallery.locator(".v21-gallery-mobile-window");
+  const reel = gallery.locator(".v21-exhibition-window");
   await reel.scrollIntoViewIfNeeded();
   await gallery.getByRole("button", { name: "Previous artwork" }).click();
-  await expect(gallery.locator(".v21-gallery-mobile-controls > span").first()).toHaveText("05 / 05");
+  await expect(gallery.locator(".v21-gallery-bottomline > span").first()).toHaveText("05 / 05");
   await gallery.getByRole("button", { name: "Next artwork" }).click();
-  await expect(gallery.locator(".v21-gallery-mobile-controls > span").first()).toHaveText("01 / 05");
+  await expect(gallery.locator(".v21-gallery-bottomline > span").first()).toHaveText("01 / 05");
   await expect.poll(() => reel.evaluate((window) => {
     const middle = window.getBoundingClientRect().left + window.clientWidth / 2;
-    const items = Array.from(window.querySelectorAll<HTMLElement>(".v21-gallery-mobile-item"));
+    const items = Array.from(window.querySelectorAll<HTMLElement>(".v21-exhibition-item"));
     const nearest = items.reduce((best, item) => Math.abs(item.getBoundingClientRect().left + item.clientWidth / 2 - middle) < Math.abs(best.getBoundingClientRect().left + best.clientWidth / 2 - middle) ? item : best, items[0]);
-    return nearest.dataset.clone ?? "real";
-  })).toBe("real");
+    return Number(nearest.dataset.gallerySlot);
+  })).toBe(5);
   expect(await reel.evaluate((node) => getComputedStyle(node).scrollSnapType)).toContain("mandatory");
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
 });
@@ -240,7 +278,7 @@ test("touch gestures allow horizontal artwork changes and vertical page scrollin
   const page = await context.newPage();
   try {
     await page.goto("/");
-    const reel = page.locator(".v21-gallery-mobile-window");
+    const reel = page.locator(".v21-exhibition-window");
     await reel.scrollIntoViewIfNeeded();
     const box = await reel.boundingBox();
     if (!box) throw new Error("Mobile reel has no bounds");
@@ -255,7 +293,7 @@ test("touch gestures allow horizontal artwork changes and vertical page scrollin
     }
     const y = box.y + box.height * .5;
     await touch(box.x + box.width * .72, y, box.x + box.width * .28, y);
-    await expect.poll(async () => Number(await page.locator(".v21-gallery-mobile").getAttribute("data-active-index"))).toBeGreaterThan(1);
+    await expect.poll(async () => Number(await page.locator(".v21-gallery").getAttribute("data-active-index"))).toBeGreaterThan(1);
     const verticalBefore = await page.evaluate(() => scrollY);
     await touch(box.x + box.width * .5, y + 90, box.x + box.width * .5, y - 90);
     await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(verticalBefore);
@@ -308,8 +346,11 @@ test("ASCII context loop stays behind readable content and becomes static in red
   const staticFrame = await livingCanvas.evaluate((node: HTMLCanvasElement) => node.toDataURL());
   await page.waitForTimeout(150);
   expect(await livingCanvas.evaluate((node: HTMLCanvasElement) => node.toDataURL())).toBe(staticFrame);
-  expect(await page.locator(".v21-gallery-track--main").evaluate((node) => getComputedStyle(node).animationName)).toBe("none");
-  await expect(page.locator(".v21-gallery-track--main .v21-gallery-set:not([aria-hidden]) img")).toHaveCount(5);
+  const exhibition = page.locator(".v21-exhibition-window");
+  const galleryPosition = await exhibition.evaluate((node) => node.scrollLeft);
+  await page.waitForTimeout(200);
+  expect(await exhibition.evaluate((node) => node.scrollLeft)).toBe(galleryPosition);
+  await expect(page.locator(".v21-exhibition-item:not([aria-hidden]) img")).toHaveCount(5);
   const projectImage = page.locator(".v2-repo-media img");
   await projectImage.scrollIntoViewIfNeeded();
   await expect.poll(() => projectImage.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0)).toBe(true);

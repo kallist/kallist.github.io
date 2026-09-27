@@ -1,0 +1,30 @@
+{
+  "url": "http://127.0.0.1:4173/",
+  "results": [
+    {
+      "width": 360,
+      "overflowPx": 0
+    },
+    {
+      "width": 375,
+      "overflowPx": 0
+    },
+    {
+      "width": 390,
+      "overflowPx": 0
+    },
+    {
+      "width": 430,
+      "overflowPx": 0
+    },
+    {
+      "width": 768,
+      "overflowPx": 0
+    },
+    {
+      "width": 1440,
+      "autoMotionPx": 26,
+      "overflowPx": 0
+    }
+  ]
+}
