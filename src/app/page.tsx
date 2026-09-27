@@ -7,7 +7,7 @@ import { ProjectImage } from "@/components/project-image";
 import { RevealObserver } from "@/components/reveal-observer";
 import { SectionPattern } from "@/components/section-pattern";
 import { WordHover } from "@/components/word-hover";
-import { AsciiTree } from "@/components/ascii-tree";
+import { AsciiContextLoop } from "@/components/ascii-context-loop";
 import { GalleryRibbon } from "@/components/gallery-ribbon";
 import { projects } from "@/content/projects";
 import { homeCopy, type Language } from "@/content/home-copy";
@@ -32,7 +32,7 @@ export default function Home() {
   return <main id="main" className="v2-home" lang={language === "zh" ? "zh-CN" : "en"}>
     <ChapterNavigation language={language} onLanguageChange={setLanguage} />
     <RevealObserver />
-    <AsciiTree />
+    <AsciiContextLoop />
 
     <section id="hero" className="v2-hero v2-field-host" aria-labelledby="hero-title">
       <SectionPattern kind="hero" />
