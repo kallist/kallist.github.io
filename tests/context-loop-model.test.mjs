@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createLoopModel, surfacePoint } from "../src/components/context-loop/model.ts";
+import { createLoopModel, flowPosition, surfacePoint } from "../src/components/context-loop/model.ts";
 
 test("context loop glyph field is deterministic, seeded and symbol led", () => {
   const first = createLoopModel(23027, .72);
@@ -11,7 +11,7 @@ test("context loop glyph field is deterministic, seeded and symbol led", () => {
   assert.ok(first.glyphs.length > 2000);
   const semantic = first.glyphs.filter((glyph) => glyph.semantic);
   assert.equal(semantic.length, 8);
-  assert.deepEqual(semantic.map((glyph) => glyph.glyph), ["CONTEXT", "RAG", "TOOL", "MEM", "TRACE", "EVAL", "REPLAY", "RUN"]);
+  assert.deepEqual(semantic.map((glyph) => glyph.glyph), ["CONTEXT", "RETRIEVE", "TOOL", "MEMORY", "TRACE", "EVAL", "REPLAY", "AGENT"]);
   for (const glyph of first.glyphs) {
     assert.ok(glyph.u >= 0 && glyph.u < Math.PI * 2);
     assert.ok(glyph.v >= -1.1 && glyph.v <= 1.1);
@@ -19,6 +19,31 @@ test("context loop glyph field is deterministic, seeded and symbol led", () => {
     assert.ok(glyph.reveal >= 0 && glyph.reveal < 2);
     if (!glyph.semantic) assert.match(glyph.glyph, /^[#@%01+=*\/\\\-:._~]$/);
   }
+});
+
+test("the half-twist presents two distinct faces across a single strip", () => {
+  const frontLeft = surfacePoint(0, -1, 0, true);
+  const frontRight = surfacePoint(0, 1, 0, true);
+  const rearLeft = surfacePoint(Math.PI, -1, 0, true);
+  const rearRight = surfacePoint(Math.PI, 1, 0, true);
+  const projectedWidth = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+  assert.ok(projectedWidth(frontLeft, frontRight) > projectedWidth(rearLeft, rearRight));
+  assert.ok(Math.abs(frontLeft.x - frontRight.x) > .3);
+  assert.ok(rearLeft.z !== rearRight.z);
+  assert.ok(surfacePoint(Math.PI / 2, 0, 0, true).z > surfacePoint(Math.PI * 1.5, 0, 0, true).z);
+});
+
+test("glyphs keep circulating at unequal lane speeds after the intro", () => {
+  const model = createLoopModel(23027, .72);
+  const middle = model.glyphs.find((glyph) => Math.abs(glyph.v) < .05 && !glyph.semantic);
+  const edge = model.glyphs.find((glyph) => Math.abs(glyph.v) > .9 && !glyph.semantic);
+  assert.ok(middle && edge);
+  assert.equal(flowPosition(middle, 0), middle.u);
+  assert.equal(flowPosition(middle, 1), middle.u);
+  assert.ok(flowPosition(middle, 6) - middle.u > .3);
+  assert.ok(flowPosition(edge, 6) - edge.u > .25);
+  assert.ok(flowPosition(middle, 30) - middle.u > flowPosition(edge, 30) - edge.u);
+  assert.equal(flowPosition(middle, 100, true), middle.u);
 });
 
 test("twisted ribbon closes as one surface and reduced motion is static", () => {

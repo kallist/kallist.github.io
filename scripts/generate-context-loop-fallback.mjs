@@ -6,11 +6,13 @@ const model = createLoopModel(23027, 1.05);
 const items = model.glyphs.map((glyph) => ({ glyph, point: surfacePoint(glyph.u, glyph.v, 0, true) }));
 items.sort((a, b) => a.point.z - b.point.z);
 const lines = items.map(({ glyph, point }) => {
-  const depth = Math.max(0, Math.min(1, (point.z + .36) / .72));
-  const opacity = Math.min(.82, (.30 + .43 * depth) * (.58 + glyph.density * .42)).toFixed(3);
-  const x = (800 + (point.x - .5) * 1648).toFixed(1);
+  const depth = Math.max(0, Math.min(1, point.z + .5));
+  const opacity = Math.min(.94, (.32 + .58 * depth ** 1.35) * (.68 + glyph.density * .32)
+    * (.82 + .18 * Math.abs(point.face))
+    * (glyph.strand ? 1.32 : 1)).toFixed(3);
+  const x = (784 + (point.x - .5) * 1504).toFixed(1);
   const y = (480 + (point.y - .5) * 1130).toFixed(1);
-  const size = (7.3 + depth * 1.4).toFixed(1);
+  const size = (8.5 + depth * 5).toFixed(1);
   return `<text x="${x}" y="${y}" opacity="${opacity}" font-size="${size}">${escape(glyph.glyph)}</text>`;
 });
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" aria-hidden="true"><g fill="#282722" font-family="Courier New, monospace" text-anchor="middle" dominant-baseline="middle">${lines.join("")}</g></svg>`;
