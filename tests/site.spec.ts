@@ -189,11 +189,24 @@ test("ASCII context loop stays behind readable content and becomes static in red
   const motionFrame = await livingCanvas.evaluate((node: HTMLCanvasElement) => node.toDataURL());
   await page.waitForTimeout(600);
   expect(await livingCanvas.evaluate((node: HTMLCanvasElement) => node.toDataURL())).not.toBe(motionFrame);
+  const continuingFrame = await livingCanvas.evaluate((node: HTMLCanvasElement) => node.toDataURL());
+  await page.waitForTimeout(2100);
+  expect(await livingCanvas.evaluate((node: HTMLCanvasElement) => node.toDataURL())).not.toBe(continuingFrame);
   expect(await loop.evaluate((node) => getComputedStyle(node).position)).toBe("fixed");
   expect(await loop.evaluate((node) => getComputedStyle(node).pointerEvents)).toBe("none");
+  const portrait = page.locator(".v2-hero-art img");
+  await expect.poll(() => portrait.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0)).toBe(true);
+  const portraitBox = await portrait.boundingBox();
+  if (!portraitBox) throw new Error("Hero portrait has no bounds");
+  const portraitInterior = { x: portraitBox.x + 2, y: portraitBox.y + 2, width: portraitBox.width - 4, height: portraitBox.height - 4 };
+  const portraitWithLoop = await page.screenshot({ clip: portraitInterior, animations: "disabled" });
+  await loop.evaluate((node: HTMLElement) => { node.style.visibility = "hidden"; });
+  expect(portraitWithLoop.equals(await page.screenshot({ clip: portraitInterior, animations: "disabled" }))).toBe(true);
+  await loop.evaluate((node: HTMLElement) => { node.style.visibility = "visible"; });
   await page.locator("#work").scrollIntoViewIfNeeded();
   await expect(page.getByRole("link", { name: /Explore case study/i }).first()).toBeVisible();
   await page.emulateMedia({ reducedMotion: "reduce" });
+  expect(await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches)).toBe(true);
   await expect(loop).toHaveAttribute("data-loop-motion", "static");
   await expect(loop).toHaveAttribute("data-loop-phase", "ready");
   const staticFrame = await livingCanvas.evaluate((node: HTMLCanvasElement) => node.toDataURL());
@@ -214,6 +227,8 @@ test("ASCII context loop stays behind readable content and becomes static in red
   const withLoop = await page.screenshot({ clip: interior, animations: "disabled" });
   await loop.evaluate((node: HTMLElement) => { node.style.visibility = "hidden"; });
   expect(withLoop.equals(await page.screenshot({ clip: interior, animations: "disabled" }))).toBe(true);
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await expect(loop).toHaveAttribute("data-loop-motion", "running");
 });
 
 test("loop arrives before hero and remains fixed through the final chapter", async ({ page }) => {

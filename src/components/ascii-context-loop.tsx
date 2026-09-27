@@ -30,6 +30,7 @@ export function AsciiContextLoop() {
     let elapsed = 0;
     let previousTime = 0;
     let previousDraw = 0;
+    let introMasksApplied = false;
     let disposed = false;
     let previousZone = "";
     host.dataset.loopMotion = motion.matches ? "static" : "running";
@@ -48,7 +49,7 @@ export function AsciiContextLoop() {
       element: document.querySelector(selector), zone, dark, strength,
     }));
     const maskNodes = [...document.querySelectorAll(
-      ".v2-hero-name h1, .v2-hero-statement, .v2-section-intro, .v2-case-media, " +
+      ".v2-hero-name h1, .v2-hero-statement, .v2-hero-art, .v2-section-intro, .v2-case-media, " +
       ".v2-repo-evidence, .v2-cue-heading, .v2-cue-flow, .v2-cue-evidence, " +
       ".v2-agent-heading, .v2-agent-coordinates, .v2-agent-evidence, " +
       ".v2-skin-heading, .v2-skin-values, .v2-skin-evidence, " +
@@ -64,7 +65,7 @@ export function AsciiContextLoop() {
       });
       const zone = current?.zone ?? "hero";
       const environment: LoopEnvironment = { dark: current?.dark ?? false, strength: current?.strength ?? 1, masks: [] };
-      if (motion.matches || elapsed >= 1.35) {
+      if (motion.matches || elapsed >= 1.05) {
         for (const node of maskNodes) {
           const rect = node.getBoundingClientRect();
           if (rect.bottom < -52 || rect.top > window.innerHeight + 52) continue;
@@ -104,6 +105,10 @@ export function AsciiContextLoop() {
       previousTime = now;
       const minimumInterval = detail < 1 ? 62 : 58;
       if (now - previousDraw >= minimumInterval) {
+        if (elapsed >= 1.05 && !introMasksApplied) {
+          introMasksApplied = true;
+          updateEnvironment();
+        }
         renderer?.draw(elapsed, false);
         previousDraw = now;
         if (elapsed >= 1.35 && host.dataset.loopPhase !== "ready") {
@@ -154,9 +159,20 @@ export function AsciiContextLoop() {
     document.addEventListener("visibilitychange", start);
     motion.addEventListener("change", start);
     finePointer.addEventListener("change", onPointerLeave);
+    // Some engines update MediaQueryList.matches without delivering its change
+    // event during an emulated or OS-level preference transition.
+    const preferenceCheck = window.setInterval(() => {
+      if (document.visibilityState === "hidden") return;
+      if ((motion.matches && host.dataset.loopMotion !== "static")
+        || (!motion.matches && host.dataset.loopMotion === "static")) {
+        start();
+        updateEnvironment();
+      }
+    }, 250);
     return () => {
       disposed = true;
       stop();
+      window.clearInterval(preferenceCheck);
       if (environmentFrame) cancelAnimationFrame(environmentFrame);
       window.removeEventListener("resize", resize);
       window.removeEventListener("scroll", scheduleEnvironment);

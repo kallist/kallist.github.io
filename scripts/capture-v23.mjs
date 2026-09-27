@@ -5,7 +5,9 @@ import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
 
 const url = process.env.QA_URL ?? "http://127.0.0.1:4173/";
-const directory = new URL("../docs/visual-qa/v23/", import.meta.url);
+const series = process.env.QA_SERIES ?? "v23";
+if (!/^v\d{2,3}$/.test(series)) throw new Error("QA_SERIES must be a version such as v231");
+const directory = new URL(`../docs/visual-qa/${series}/`, import.meta.url);
 await mkdir(directory, { recursive: true });
 let localServer;
 if (url.startsWith("http://127.0.0.1:4173/") && !(await fetch(url).then((response) => response.ok).catch(() => false))) {

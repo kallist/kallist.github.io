@@ -1,4 +1,4 @@
-import { surfacePoint, type LoopModel, type SurfacePoint } from "./model";
+import { flowPosition, surfacePoint, type LoopModel, type SurfacePoint } from "./model";
 
 type Point = { x: number; y: number };
 export type MaskRect = { left: number; right: number; top: number; bottom: number };
@@ -27,7 +27,8 @@ function maskStrength(x: number, y: number, masks: MaskRect[]) {
 export function createLoopRenderer(canvas: HTMLCanvasElement, model: LoopModel): LoopRenderer | null {
   const ctx = canvas.getContext("2d", { alpha: true });
   if (!ctx) return null;
-  const points: SurfacePoint[] = model.glyphs.map(() => ({ x: 0, y: 0, z: 0 }));
+  const points: SurfacePoint[] = model.glyphs.map(() => ({ x: 0, y: 0, z: 0, face: 0 }));
+  const semanticAhead: SurfacePoint = { x: 0, y: 0, z: 0, face: 0 };
   const buckets: number[][] = Array.from({ length: depthBuckets }, () => []);
   let width = 1;
   let height = 1;
@@ -62,29 +63,28 @@ export function createLoopRenderer(canvas: HTMLCanvasElement, model: LoopModel):
         pointerWeight *= .86;
       }
       for (const bucket of buckets) bucket.length = 0;
-      const flow = reducedMotion ? 0 : Math.max(0, seconds - 1) * .039;
       for (let index = 0; index < model.glyphs.length; index++) {
         const glyph = model.glyphs[index];
         if (!reducedMotion && seconds < glyph.reveal) continue;
         if (!reducedMotion && Math.abs(glyph.v) > .72 && glyph.seed < .28
           && Math.sin(seconds * .43 + glyph.phase) < -.47) continue;
-        const u = glyph.u + flow;
+        const u = flowPosition(glyph, seconds, reducedMotion);
         const v = glyph.v + (reducedMotion ? 0 : .012 * Math.sin(seconds * .38 + glyph.phase));
         const point = surfacePoint(u, v, reducedMotion ? 0 : seconds, reducedMotion, points[index]);
-        const bucket = Math.max(0, Math.min(depthBuckets - 1, Math.floor((point.z + .38) / .76 * depthBuckets)));
+        const bucket = Math.max(0, Math.min(depthBuckets - 1, Math.floor((point.z + .5) * depthBuckets)));
         buckets[bucket].push(index);
       }
 
       const isMobile = width < 700;
-      const spanX = width * (isMobile ? .99 : 1.03);
-      const spanY = height * (isMobile ? 1.02 : 1.13);
-      const originX = width * .5;
-      const originY = height * (isMobile ? .49 : .48);
+      const spanX = width * (isMobile ? .92 : .94);
+      const spanY = height * (isMobile ? .63 : 1.13);
+      const originX = width * .49;
+      const originY = height * (isMobile ? .27 : .48);
       const ink = environment.dark ? "#e6e1d7" : "#282722";
       ctx.fillStyle = ink;
       for (let bucket = 0; bucket < depthBuckets; bucket++) {
         const depth = bucket / (depthBuckets - 1);
-        const fontSize = (isMobile ? 6.7 : 7.3) + depth * (isMobile ? .8 : 1.4);
+        const fontSize = (isMobile ? 7 : 8.5) + depth * (isMobile ? 3.8 : 5);
         ctx.font = `${fontSize.toFixed(1)}px "Courier New", monospace`;
         for (const index of buckets[bucket]) {
           const glyph = model.glyphs[index];
@@ -106,19 +106,34 @@ export function createLoopRenderer(canvas: HTMLCanvasElement, model: LoopModel):
             y += dy / distance * pointerBoost * 2.4;
           }
           if (x < -40 || x > width + 40 || y < -15 || y > height + 15) continue;
-          const depthAlpha = .30 + .43 * depth;
-          const densityAlpha = .58 + glyph.density * .42;
+          const depthAlpha = .32 + .58 * Math.pow(depth, 1.35);
+          const densityAlpha = .68 + glyph.density * .32;
+          const faceAlpha = .82 + .18 * Math.abs(point.face);
           const localMask = maskStrength(x, y, environment.masks);
-          const alpha = Math.min(.82, depthAlpha * densityAlpha * environment.strength * localMask * (1 + pointerBoost * .10));
+          const alpha = Math.min(glyph.strand ? .94 : .86, depthAlpha * densityAlpha * faceAlpha
+            * environment.strength * localMask * (1 + pointerBoost * .10));
           if (alpha < .018) continue;
-          ctx.globalAlpha = alpha;
+          ctx.globalAlpha = glyph.strand ? Math.min(.94, alpha * 1.32) : alpha;
           const substitute = !reducedMotion && glyph.seed < .075 && Math.sin(seconds * .64 + glyph.phase) > .85;
           const symbol = substitute ? glyph.alternate : glyph.glyph;
           if (glyph.semantic) {
             ctx.font = `${(fontSize + .5).toFixed(1)}px "Courier New", monospace`;
             ctx.globalAlpha = Math.min(.70, alpha * 1.3);
           }
-          ctx.fillText(symbol, x, y);
+          if (glyph.semantic) {
+            const u = flowPosition(glyph, seconds, reducedMotion);
+            const ahead = surfacePoint(u + .008, glyph.v, reducedMotion ? 0 : seconds, reducedMotion, semanticAhead);
+            let angle = Math.atan2((ahead.y - point.y) * spanY, (ahead.x - point.x) * spanX);
+            if (angle > Math.PI / 2) angle -= Math.PI;
+            if (angle < -Math.PI / 2) angle += Math.PI;
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(Math.max(-.28, Math.min(.28, angle)));
+            ctx.fillText(symbol, 0, 0);
+            ctx.restore();
+          } else {
+            ctx.fillText(symbol, x, y);
+          }
           if (glyph.semantic) ctx.font = `${fontSize.toFixed(1)}px "Courier New", monospace`;
         }
       }
