@@ -56,6 +56,7 @@ export function AsciiContextLoop() {
       ".v2-education-art, .v2-education-copy, .v2-method-grid, " +
       ".v2-experience, .v2-capabilities, .v2-visual-heading, .v21-gallery-window, .v2-contact-body",
     )];
+    const heroFrame = document.querySelector(".v2-hero .v2-frame");
     const updateEnvironment = () => {
       const middleY = window.innerHeight / 2;
       const current = chapterNodes.find(({ element }) => {
@@ -65,7 +66,7 @@ export function AsciiContextLoop() {
       });
       const zone = current?.zone ?? "hero";
       const environment: LoopEnvironment = { dark: current?.dark ?? false, strength: current?.strength ?? 1, masks: [] };
-      if (motion.matches || elapsed >= 1.05) {
+      if (motion.matches || introMasksApplied) {
         for (const node of maskNodes) {
           const rect = node.getBoundingClientRect();
           if (rect.bottom < -52 || rect.top > window.innerHeight + 52) continue;
@@ -105,7 +106,8 @@ export function AsciiContextLoop() {
       previousTime = now;
       const minimumInterval = detail < 1 ? 62 : 58;
       if (now - previousDraw >= minimumInterval) {
-        if (elapsed >= 1.05 && !introMasksApplied) {
+        if (!introMasksApplied && (window.scrollY > 100
+          || (heroFrame && Number.parseFloat(getComputedStyle(heroFrame).opacity) > .02))) {
           introMasksApplied = true;
           updateEnvironment();
         }

@@ -63,18 +63,21 @@ try {
     if (width === 1440) {
       await page.waitForTimeout(150);
       await capture(page, "intro-early-1440.webp", false, "allow");
+      await page.locator("[data-global-context-loop][data-loop-phase=forming]").waitFor();
       await page.waitForTimeout(550);
       await capture(page, "intro-loop-1440.webp", false, "allow");
-      await page.waitForTimeout(550);
+      await page.waitForTimeout(1550);
       await capture(page, "intro-page-1440.webp", false, "allow");
     } else if (width === 390) {
+      await page.locator("[data-global-context-loop][data-loop-phase=forming]").waitFor();
       await page.waitForTimeout(500);
       await capture(page, "intro-loop-390.webp", false, "allow");
       await page.waitForTimeout(650);
       await capture(page, "intro-resolved-390.webp", false, "allow");
     }
     await page.locator("[data-global-context-loop][data-loop-phase=ready]").waitFor();
-    await page.waitForTimeout(300);
+    await page.waitForFunction(() => getComputedStyle(document.querySelector(".v2-hero .v2-frame")).opacity === "1");
+    await page.waitForTimeout(100);
     await capture(page, `hero-${width}.webp`);
     if (width === 1440) {
       const before = await captureLoop(page, "loop-isolated-0.webp");

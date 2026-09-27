@@ -22,9 +22,9 @@
   ],
   "motion": {
     "intervalMs": 5500,
-    "changedPixelsOverInterval": 147475,
-    "changedPixelsWithPointerAndTime": 143417,
-    "taskSeconds": 2.2,
-    "scriptSeconds": 1.11
+    "changedPixelsOverInterval": 147085,
+    "changedPixelsWithPointerAndTime": 143743,
+    "taskSeconds": 2.08,
+    "scriptSeconds": 1.12
   }
 }

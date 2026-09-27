@@ -14,7 +14,7 @@ Seeded ASCII symbols sample the surface. Denser, guaranteed glyph filaments foll
 
 Glyphs advance in the longitudinal surface coordinate after the intro, with a small speed difference between interior and edge lanes. Bounded transverse drift and rare within-family character substitution add variation. The movement continues without pointer input; pointer influence is local. The renderer caps DPR and draw cadence, adapts detail to viewport width, and stops drawing when the page is hidden.
 
-The opening sequence still forms the character surface before the Hero appears. Text and image masks now activate before the Hero fades in, including the portrait region. Mobile projection uses a shorter vertical span to keep the whole fold visible above the portrait. Education, gallery and project media retain content precedence. A fixed interval reconciles `prefers-reduced-motion` state when a browser updates the media query without delivering its change event; reduced motion draws one static complete frame.
+The opening sequence still forms the character surface before the Hero appears. Text and image masks activate when the Hero begins to appear, including the portrait region; the loop therefore stays whole during the isolated intro. Mobile projection uses a shorter vertical span to keep the whole fold visible above the portrait. Education, gallery and project media retain content precedence. A fixed interval reconciles `prefers-reduced-motion` state when a browser updates the media query without delivering its change event; reduced motion draws one static complete frame.
 
 ## Boundaries
 
