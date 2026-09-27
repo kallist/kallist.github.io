@@ -54,7 +54,7 @@ export function AsciiContextLoop() {
       ".v2-agent-heading, .v2-agent-coordinates, .v2-agent-evidence, " +
       ".v2-skin-heading, .v2-skin-values, .v2-skin-evidence, " +
       ".v2-education-art, .v2-education-copy, .v2-method-grid, " +
-      ".v2-experience, .v2-capabilities, .v2-visual-heading, .v21-gallery-window, .v2-contact-body",
+      ".v2-experience, .v2-capabilities, .v2-visual-heading, .v21-gallery, .v2-contact-body",
     )];
     const heroFrame = document.querySelector(".v2-hero .v2-frame");
     const updateEnvironment = () => {

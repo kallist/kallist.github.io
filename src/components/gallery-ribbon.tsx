@@ -1,173 +1,189 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
 import Image from "next/image";
-import { galleryWorks, type GalleryWork } from "@/content/gallery";
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import { galleryWorks } from "@/content/gallery";
 import { homeCopy, type Language } from "@/content/home-copy";
 
-function WorkSet({ works, decorative, language, echo = false }: { works: readonly GalleryWork[]; decorative: boolean; language: Language; echo?: boolean }) {
-  return <div className="v21-gallery-set" aria-hidden={decorative ? "true" : undefined}>
-    {works.map((work, index) => <figure className={`v21-gallery-item v21-gallery-item--${work.shape} v21-gallery-item--${work.scale}`} key={work.id}>
-      <div className="v21-gallery-image"><Image src={work.src} alt={decorative || echo ? "" : language === "zh" ? work.altZh : work.alt} width={work.width} height={work.height} loading={decorative || echo ? "lazy" : "eager"} unoptimized /></div>
-      {!echo && <figcaption><span>{String(index + 1).padStart(2, "0")} / {String(galleryWorks.length).padStart(2, "0")}</span><span>{language === "zh" ? work.captionZh : work.caption}</span></figcaption>}
-    </figure>)}
-  </div>;
-}
+const count = galleryWorks.length;
+const repeatedWorks = Array.from({ length: 3 }, (_, cycle) =>
+  galleryWorks.map((work, index) => ({ work, index, cycle })),
+).flat();
 
-function MobileGallery({ language }: { language: Language }) {
+export function GalleryRibbon({ language }: { language: Language }) {
+  const [activeSlot, setActiveSlot] = useState(count);
+  const [paused, setPaused] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [dragging, setDragging] = useState(false);
   const windowRef = useRef<HTMLDivElement>(null);
+  const activeSlotRef = useRef(count);
+  const dragRef = useRef<{ x: number; scroll: number } | null>(null);
+  const manualUntilRef = useRef(0);
+  const autoRemainderRef = useRef(0);
+  const scrollFrameRef = useRef<number | null>(null);
   const settleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const frameRef = useRef<number | null>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const activeRef = useRef(0);
-  const count = galleryWorks.length;
-  const reel = [galleryWorks[count - 1], ...galleryWorks, galleryWorks[0]];
+  const copy = homeCopy[language];
+  const activeIndex = activeSlot % count;
 
-  const positionFor = useCallback((item: HTMLElement, window: HTMLDivElement) =>
-    window.scrollLeft + item.getBoundingClientRect().left - window.getBoundingClientRect().left - (window.clientWidth - item.clientWidth) / 2, []);
+  const itemsIn = useCallback((window: HTMLDivElement) =>
+    Array.from(window.querySelectorAll<HTMLElement>(".v21-exhibition-item")), []);
 
-  const nearest = useCallback((window: HTMLDivElement) => {
-    const items = Array.from(window.querySelectorAll<HTMLElement>(".v21-gallery-mobile-item"));
+  const positionFor = useCallback((window: HTMLDivElement, item: HTMLElement) =>
+    window.scrollLeft + item.getBoundingClientRect().left - window.getBoundingClientRect().left -
+    (window.clientWidth - item.getBoundingClientRect().width) / 2, []);
+
+  const nearestSlot = useCallback((window: HTMLDivElement, items: HTMLElement[]) => {
     const middle = window.getBoundingClientRect().left + window.clientWidth / 2;
-    return items.reduce((best, item) =>
-      Math.abs(item.getBoundingClientRect().left + item.clientWidth / 2 - middle) <
-      Math.abs(best.getBoundingClientRect().left + best.clientWidth / 2 - middle) ? item : best, items[0]);
+    return items.reduce((best, item, index) => {
+      const rect = item.getBoundingClientRect();
+      const bestRect = items[best].getBoundingClientRect();
+      return Math.abs(rect.left + rect.width / 2 - middle) <
+        Math.abs(bestRect.left + bestRect.width / 2 - middle) ? index : best;
+    }, 0);
   }, []);
 
-  const settle = useCallback(() => {
+  const setSlot = useCallback((slot: number) => {
+    activeSlotRef.current = slot;
+    setActiveSlot(slot);
+  }, []);
+
+  const updateFromPosition = useCallback(() => {
     const window = windowRef.current;
     if (!window) return;
-    const item = nearest(window);
-    if (!item) return;
-    const index = Number(item.dataset.index);
-    activeRef.current = index;
-    setActiveIndex(index);
-    if (item.dataset.clone === "true") {
-      const real = window.querySelector<HTMLElement>(`.v21-gallery-mobile-item[data-index="${index}"]:not([data-clone])`);
-      if (real) {
-        window.style.scrollSnapType = "none";
-        window.scrollLeft = positionFor(real, window);
-        requestAnimationFrame(() => { window.style.scrollSnapType = ""; });
-      }
+    const items = itemsIn(window);
+    if (items.length) setSlot(nearestSlot(window, items));
+  }, [itemsIn, nearestSlot, setSlot]);
+
+  const normalize = useCallback(() => {
+    const window = windowRef.current;
+    if (!window) return;
+    const items = itemsIn(window);
+    if (items.length !== count * 3) return;
+    const slot = nearestSlot(window, items);
+    const cycleWidth = items[count].offsetLeft - items[0].offsetLeft;
+    const shift = slot < count ? cycleWidth : slot >= count * 2 ? -cycleWidth : 0;
+    if (shift) {
+      window.style.scrollSnapType = "none";
+      window.scrollLeft += shift;
+      requestAnimationFrame(() => { window.style.scrollSnapType = ""; });
+      setSlot(slot + (shift > 0 ? count : -count));
+    } else {
+      setSlot(slot);
     }
-  }, [nearest, positionFor]);
+  }, [itemsIn, nearestSlot, setSlot]);
 
   useEffect(() => {
     const window = windowRef.current;
-    const first = window?.querySelector<HTMLElement>('.v21-gallery-mobile-item[data-index="0"]:not([data-clone])');
+    const first = window && itemsIn(window)[count];
     if (!window || !first) return;
-    window.scrollLeft = positionFor(first, window);
+    window.scrollLeft = positionFor(window, first);
     let width = window.clientWidth;
-    const resize = new ResizeObserver(() => {
+    const observer = new ResizeObserver(() => {
       if (window.clientWidth === width) return;
       width = window.clientWidth;
-      window.scrollLeft = positionFor(window.querySelector<HTMLElement>(`.v21-gallery-mobile-item[data-index="${activeRef.current}"]:not([data-clone])`) ?? first, window);
+      const item = itemsIn(window)[activeSlotRef.current];
+      if (item) window.scrollLeft = positionFor(window, item);
     });
-    resize.observe(window);
-    return () => { resize.disconnect(); if (settleRef.current) clearTimeout(settleRef.current); if (frameRef.current) cancelAnimationFrame(frameRef.current); };
-  }, [positionFor]);
+    observer.observe(window);
+    return () => {
+      observer.disconnect();
+      if (scrollFrameRef.current) cancelAnimationFrame(scrollFrameRef.current);
+      if (settleRef.current) clearTimeout(settleRef.current);
+    };
+  }, [itemsIn, positionFor]);
+
+  useEffect(() => {
+    let frame: number;
+    let previous = performance.now();
+    const tick = (now: number) => {
+      const window = windowRef.current;
+      const delta = Math.min(now - previous, 64);
+      previous = now;
+      if (window && matchMedia("(min-width: 641px)").matches &&
+        !matchMedia("(prefers-reduced-motion: reduce)").matches &&
+        document.visibilityState === "visible" && !paused && !hovered && !dragging &&
+        now > manualUntilRef.current) {
+        const advance = autoRemainderRef.current + delta * .012;
+        const wholePixels = Math.trunc(advance);
+        autoRemainderRef.current = advance - wholePixels;
+        if (wholePixels) {
+          window.scrollLeft += wholePixels;
+          normalize();
+        }
+      }
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [dragging, hovered, normalize, paused]);
 
   function onScroll() {
-    const window = windowRef.current;
-    if (!window) return;
-    if (frameRef.current) cancelAnimationFrame(frameRef.current);
-    frameRef.current = requestAnimationFrame(() => {
-      const item = nearest(window);
-      if (item) { activeRef.current = Number(item.dataset.index); setActiveIndex(activeRef.current); }
-    });
+    if (scrollFrameRef.current) cancelAnimationFrame(scrollFrameRef.current);
+    scrollFrameRef.current = requestAnimationFrame(updateFromPosition);
     if (settleRef.current) clearTimeout(settleRef.current);
-    settleRef.current = setTimeout(settle, 180);
+    settleRef.current = setTimeout(normalize, 200);
   }
 
   function move(direction: -1 | 1) {
     const window = windowRef.current;
     if (!window) return;
-    const current = nearest(window);
-    const items = Array.from(window.querySelectorAll<HTMLElement>(".v21-gallery-mobile-item"));
-    const next = items[items.indexOf(current) + direction];
-    if (next) window.scrollTo({ left: positionFor(next, window), behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    const items = itemsIn(window);
+    const next = items[activeSlotRef.current + direction];
+    if (!next) return;
+    manualUntilRef.current = performance.now() + 4000;
+    window.scrollTo({ left: positionFor(window, next), behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   }
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
-      event.preventDefault();
-      move(event.key === "ArrowRight" ? 1 : -1);
-    }
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    move(event.key === "ArrowLeft" ? -1 : 1);
   }
 
-  const stageHeight = galleryWorks[activeIndex].shape === "portrait" ? "min(118vw, 470px)" : "min(76vw, 325px)";
-  return <div className="v21-gallery-mobile" data-active-index={activeIndex + 1} style={{ "--mobile-stage-height": stageHeight } as CSSProperties}>
-    <div className="v21-gallery-mobile-window" ref={windowRef} role="region" aria-roledescription={language === "zh" ? "作品画廊" : "artwork reel"} aria-label={language === "zh" ? "视觉作品，左右滑动浏览" : "Visual works, swipe left or right"} tabIndex={0} onScroll={onScroll} onKeyDown={onKeyDown}>
-      <div className="v21-gallery-mobile-track">
-        {reel.map((work, position) => {
-          const clone = position === 0 || position === reel.length - 1;
-          const index = position === 0 ? count - 1 : position === reel.length - 1 ? 0 : position - 1;
-          return <figure className="v21-gallery-mobile-item" data-index={index} data-clone={clone ? "true" : undefined} data-active={!clone && index === activeIndex ? "true" : undefined} aria-hidden={clone ? "true" : undefined} key={`${work.id}-${position}`}>
-            <div className="v21-gallery-mobile-image" style={{ aspectRatio: `${work.width} / ${work.height}` }}><Image src={work.src} alt={clone ? "" : language === "zh" ? work.altZh : work.alt} width={work.width} height={work.height} unoptimized /></div>
+  function startDrag(event: PointerEvent<HTMLDivElement>) {
+    if (event.pointerType === "touch" || !windowRef.current) return;
+    dragRef.current = { x: event.clientX, scroll: windowRef.current.scrollLeft };
+    windowRef.current.setPointerCapture(event.pointerId);
+    setDragging(true);
+  }
+
+  function moveDrag(event: PointerEvent<HTMLDivElement>) {
+    if (!dragRef.current || !windowRef.current) return;
+    windowRef.current.scrollLeft = dragRef.current.scroll - (event.clientX - dragRef.current.x);
+  }
+
+  function stopDrag(event: PointerEvent<HTMLDivElement>) {
+    if (!dragRef.current) return;
+    dragRef.current = null;
+    manualUntilRef.current = performance.now() + 4000;
+    setDragging(false);
+    const window = windowRef.current;
+    if (window?.hasPointerCapture(event.pointerId)) window.releasePointerCapture(event.pointerId);
+  }
+
+  return <div className="v21-gallery" data-gallery-count={count} data-active-index={activeIndex + 1} data-active-shape={galleryWorks[activeIndex].shape} data-paused={paused}>
+    <div className="v21-gallery-topline v2-frame"><span>FIG 04 / {copy.galleryTop}</span><span>{String(count).padStart(2, "0")} {copy.galleryCount}</span></div>
+    <div className="v21-exhibition-window" ref={windowRef} data-dragging={dragging} role="region" aria-roledescription={language === "zh" ? "作品画廊" : "artwork reel"} aria-label={copy.galleryRegion} tabIndex={0} onScroll={onScroll} onKeyDown={onKeyDown} onPointerDown={startDrag} onPointerMove={moveDrag} onPointerUp={stopDrag} onPointerCancel={stopDrag} onPointerEnter={(event) => { if (event.pointerType === "mouse") setHovered(true); }} onPointerLeave={() => setHovered(false)}>
+      <div className="v21-exhibition-track">
+        {repeatedWorks.map(({ work, index, cycle }, slot) => {
+          const distance = Math.abs(slot - activeSlot);
+          const prominence = distance === 0 ? "active" : distance === 1 ? "near" : distance === 2 ? "outer" : "distant";
+          const decorative = cycle !== 1;
+          return <figure className="v21-exhibition-item" data-prominence={prominence} data-shape={work.shape} data-gallery-slot={slot} aria-hidden={decorative ? "true" : undefined} key={`${cycle}-${work.id}`}>
+            <div className="v21-exhibition-image" style={{ aspectRatio: `${work.width} / ${work.height}` }}><Image src={work.src} alt={decorative ? "" : language === "zh" ? work.altZh : work.alt} width={work.width} height={work.height} loading={decorative ? "lazy" : "eager"} unoptimized /></div>
             <figcaption><span>{String(index + 1).padStart(2, "0")} / {String(count).padStart(2, "0")}</span><span>{language === "zh" ? work.captionZh : work.caption}</span></figcaption>
           </figure>;
         })}
       </div>
     </div>
-    <div className="v21-gallery-mobile-controls v2-frame">
+    <div className="v21-gallery-bottomline v2-frame">
       <span aria-live="polite">{String(activeIndex + 1).padStart(2, "0")} / {String(count).padStart(2, "0")}</span>
-      <span>{language === "zh" ? "左右滑动 · 作品档案" : "Swipe · open archive"}</span>
-      <div><button type="button" onClick={() => move(-1)} aria-label={language === "zh" ? "上一幅作品" : "Previous artwork"}>←</button><button type="button" onClick={() => move(1)} aria-label={language === "zh" ? "下一幅作品" : "Next artwork"}>→</button></div>
-    </div>
-  </div>;
-}
-
-export function GalleryRibbon({ language }: { language: Language }) {
-  const [paused, setPaused] = useState(false);
-  const [dragging, setDragging] = useState(false);
-  const windowRef = useRef<HTMLDivElement>(null);
-  const dragRef = useRef<{ x: number; scroll: number } | null>(null);
-  const reversed = [...galleryWorks].reverse();
-  const copy = homeCopy[language];
-  useEffect(() => {
-    const target = windowRef.current;
-    if (!target) return;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const center = () => {
-      const firstSet = target.querySelector<HTMLElement>(".v21-gallery-track--main .v21-gallery-set");
-      target.scrollLeft = reducedMotion.matches ? 0 : Math.max(0, (firstSet?.offsetWidth ?? 0) - target.clientWidth * .24);
-    };
-    center();
-    reducedMotion.addEventListener("change", center);
-    return () => reducedMotion.removeEventListener("change", center);
-  }, []);
-  function startDrag(event: PointerEvent<HTMLDivElement>) {
-    if (event.pointerType === "touch") return;
-    const target = windowRef.current;
-    if (!target) return;
-    dragRef.current = { x: event.clientX, scroll: target.scrollLeft };
-    target.setPointerCapture(event.pointerId);
-    setDragging(true);
-  }
-  function moveDrag(event: PointerEvent<HTMLDivElement>) {
-    if (!dragRef.current || !windowRef.current) return;
-    windowRef.current.scrollLeft = dragRef.current.scroll - (event.clientX - dragRef.current.x);
-  }
-  function stopDrag(event: PointerEvent<HTMLDivElement>) {
-    dragRef.current = null;
-    setDragging(false);
-    if (windowRef.current?.hasPointerCapture(event.pointerId)) windowRef.current.releasePointerCapture(event.pointerId);
-  }
-  return <div className="v21-gallery" data-gallery-count={galleryWorks.length} data-paused={paused}>
-    <div className="v21-gallery-topline v2-frame"><span>FIG 04 / {copy.galleryTop}</span><span>{String(galleryWorks.length).padStart(2, "0")} {copy.galleryCount}</span></div>
-    <div className="v21-gallery-window" ref={windowRef} data-dragging={dragging} role="region" aria-label={copy.galleryRegion} tabIndex={0} onPointerDown={startDrag} onPointerMove={moveDrag} onPointerUp={stopDrag} onPointerCancel={stopDrag}>
-      <div className="v21-gallery-track v21-gallery-track--main">
-        <WorkSet works={galleryWorks} decorative language={language} />
-        <WorkSet works={galleryWorks} decorative={false} language={language} />
-        <WorkSet works={galleryWorks} decorative language={language} />
-      </div>
-      <div className="v21-gallery-track v21-gallery-track--echo" aria-hidden="true">
-        <WorkSet works={reversed} decorative language={language} echo />
-        <WorkSet works={reversed} decorative language={language} echo />
-        <WorkSet works={reversed} decorative language={language} echo />
+      <span className="v21-gallery-direction">← {copy.galleryContinue} →</span>
+      <div className="v21-gallery-controls">
+        <button type="button" onClick={() => move(-1)} aria-label={language === "zh" ? "上一幅作品" : "Previous artwork"}>←</button>
+        <button type="button" onClick={() => move(1)} aria-label={language === "zh" ? "下一幅作品" : "Next artwork"}>→</button>
+        <button type="button" className="v21-gallery-motion" aria-pressed={paused} onClick={() => setPaused((value) => !value)}>{paused ? copy.galleryResume : copy.galleryPause}</button>
       </div>
     </div>
-    <MobileGallery language={language} />
-    <div className="v21-gallery-bottomline v2-frame"><span>← {copy.galleryContinue} →</span><button type="button" className="v21-gallery-motion" aria-pressed={paused} onClick={() => setPaused((value) => !value)}>{paused ? copy.galleryResume : copy.galleryPause}</button></div>
   </div>;
 }
