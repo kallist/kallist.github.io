@@ -474,14 +474,14 @@ body:has(.v2-home) .site-footer { display: none; }
   .v2-word:hover { translate: none; }
 }
 
-/* The glyph canvas sits above chapter surfaces and below their content frames. */
-.v2-global-tree { position: fixed; z-index: 1; inset: 0; overflow: hidden; pointer-events: none; }
-.v2-global-tree canvas, .v2-global-tree .v22-tree-fallback, .v2-global-tree .v22-tree-noscript { position: absolute; inset: 0; width: 100%; height: 100%; }
-.v2-global-tree canvas, .v2-global-tree .v22-tree-noscript { display: block; }
-.v2-global-tree .v22-tree-fallback, .v2-global-tree .v22-tree-noscript { object-fit: cover; opacity: .55; }
-.v2-global-tree .v22-tree-fallback { display: none; }
-.v2-global-tree[data-tree-phase="pending"] .v22-tree-fallback { display: block; opacity: .32; clip-path: inset(0 42% 0 42%); }
-.v2-global-tree[data-tree-phase="fallback"] .v22-tree-fallback { display: block; }
+/* One character-built loop lives between chapter paper and editorial content. */
+.v2-global-loop { position: fixed; z-index: 1; inset: 0; overflow: hidden; pointer-events: none; }
+.v2-global-loop canvas, .v2-global-loop .v23-loop-fallback, .v2-global-loop .v23-loop-noscript { position: absolute; inset: 0; width: 100%; height: 100%; }
+.v2-global-loop canvas, .v2-global-loop .v23-loop-noscript { display: block; }
+.v2-global-loop .v23-loop-fallback, .v2-global-loop .v23-loop-noscript { object-fit: fill; opacity: .55; }
+.v2-global-loop .v23-loop-fallback { display: none; }
+.v2-global-loop[data-loop-phase="pending"] .v23-loop-fallback { display: block; opacity: .16; }
+.v2-global-loop[data-loop-phase="fallback"] .v23-loop-fallback { display: block; }
 .v2-hero-statement { background: linear-gradient(90deg, rgba(235,232,226,.96), rgba(235,232,226,.80)); padding: 7px 10px 7px 0; }
 @keyframes v21-hero-paper { 0% { background: rgba(233,230,223,.08); } 30% { background: rgba(233,230,223,.25); } 100% { background: rgba(233,230,223,.68); } }
 .v2-hero .v2-frame { animation: v21-page-arrive .6s 1.4s ease-out both; }
@@ -549,7 +549,6 @@ body:has(.v2-home) .site-footer { display: none; }
 .v2-education-art img { filter: drop-shadow(0 19px 35px rgba(0,0,0,.16)); }
 
 @media (max-width: 700px) {
-  .v2-global-tree :is(.v22-tree-fallback, .v22-tree-noscript) { width: 260%; max-width: none; left: -80%; }
   .v21-language-switch { top: 56px; right: calc(var(--v2-rail) + 8px); }
   .v21-language-switch button { min-width: 49px; min-height: 44px; font-size: 12px; padding: 0 6px; }
   .v21-language-switch--dialog { position: static; }

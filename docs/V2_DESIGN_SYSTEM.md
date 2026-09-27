@@ -1,6 +1,6 @@
 # Kallist V2 design system
 
-This document records the V2 foundation. V2.2 replaces the static layered background tree; see [living tree design](V22_LIVING_TREE_DESIGN.md) and [visual review](V22_LIVING_TREE_REVIEW.md).
+This document records the V2 foundation. V2.3 replaces the V2.2 global tree with the [ASCII context loop](V23_CONTEXT_LOOP_DESIGN.md); earlier [living tree design](V22_LIVING_TREE_DESIGN.md) and [visual review](V22_LIVING_TREE_REVIEW.md) remain as historical records.
 
 ## Composition
 

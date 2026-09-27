@@ -22,7 +22,7 @@ npm run e2e
 
 Project facts are in `src/content/projects.ts`. Source references, decisions and asset origins are in `docs/`. Images in `public/projects/` are copied from pinned public repository commits. The original supplied self portrait is in `assets/`; a WebP encoding of the same drawing is served in `public/portrait/`. The public resume is an HTML route with browser print styling and an inspected, phone-free PDF download. The private/source resume PDFs are deliberately excluded.
 
-The V2 homepage uses fixed measurement rails, a chapter overlay, transparent character fields and a numeric drawing of the university gate. V2.2 replaces the static layered background tree with an original, deterministic Canvas 2D character tree; see its [design](docs/V22_LIVING_TREE_DESIGN.md), [review](docs/V22_LIVING_TREE_REVIEW.md) and [visual QA](docs/visual-qa/v22/README.md). The [V2 design system](docs/V2_DESIGN_SYSTEM.md), [reference audit](docs/V2_REFERENCE_AUDIT.md), [asset inventory](docs/ASSET_INVENTORY.md) and [V2 visual QA](docs/visual-qa/v2/README.md) remain as history.
+The V2 homepage uses fixed measurement rails, a chapter overlay, transparent character fields and a numeric drawing of the university gate. V2.3 replaces the global tree with an original, deterministic Canvas 2D ASCII context loop; see its [design](docs/V23_CONTEXT_LOOP_DESIGN.md), [review](docs/V23_CONTEXT_LOOP_REVIEW.md) and [visual QA](docs/visual-qa/v23/README.md). The [V2 design system](docs/V2_DESIGN_SYSTEM.md), [reference audit](docs/V2_REFERENCE_AUDIT.md), [asset inventory](docs/ASSET_INVENTORY.md), [V2.2 tree design](docs/V22_LIVING_TREE_DESIGN.md) and [V2 visual QA](docs/visual-qa/v2/README.md) remain as history.
 
 ## Deployment
 

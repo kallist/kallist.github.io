@@ -28,6 +28,7 @@ test("export contains the real portrait, pinned project images and SEO files", (
     "graphics/scau-gate.svg",
     "graphics/ascii-tree-near.svg",
     "graphics/ascii-tree-far.svg",
+    "graphics/ascii-context-loop.svg",
     "gallery/birthday-color.webp",
     "gallery/birthday-ink.webp",
     "gallery/comic-two-panel.webp",
@@ -98,6 +99,7 @@ test("exported homepage includes factual Chinese education and the character gat
   assert.match(home, /2023\.09/);
   assert.match(home, /2027\.06/);
   assert.match(home, /graphics\/scau-gate\.svg/);
+  assert.match(home, /graphics\/ascii-context-loop\.svg/);
   assert.doesNotMatch(home, /Detail 01|Detail 02/);
 });
 
