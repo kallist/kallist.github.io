@@ -136,10 +136,10 @@ test("body words and display text have hover feedback, and homepage images load"
   }
 });
 
-test("visual practice is a data-driven, draggable five-work band with a motion control", async ({
+test("desktop visual practice retains its data-driven five-work band and motion control", async ({
   page,
 }) => {
-  for (const width of [1440, 390]) {
+  for (const width of [1440, 768]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
     const gallery = page.locator(".v21-gallery");
@@ -167,6 +167,102 @@ test("visual practice is a data-driven, draggable five-work band with a motion c
     await page.mouse.up();
     expect(await viewport.evaluate((node) => node.scrollLeft)).toBeGreaterThan(before);
     await expect(gallery).not.toContainText(/Detail 01|Detail 02|same artwork/);
+  }
+});
+
+test("mobile visual practice has one snap reel, unique works, connected captions and live position", async ({ page }) => {
+  for (const width of [360, 375, 390, 430]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto("/");
+    const gallery = page.locator(".v21-gallery");
+    const reel = gallery.locator(".v21-gallery-mobile-window");
+    await reel.scrollIntoViewIfNeeded();
+    await expect(reel).toBeVisible();
+    await expect(gallery.locator(".v21-gallery-window")).toBeHidden();
+    await expect(gallery.locator(".v21-gallery-track--echo")).toBeHidden();
+    const works = gallery.locator(".v21-gallery-mobile-item:not([data-clone])");
+    await expect(works).toHaveCount(5);
+    expect(new Set(await works.locator("img").evaluateAll((nodes) => nodes.map((node) => (node as HTMLImageElement).src))).size).toBe(5);
+    await expect(gallery.locator(".v21-gallery-mobile-item[data-clone]" )).toHaveCount(2);
+    await expect(gallery.locator(".v21-gallery-mobile-controls > span").first()).toHaveText("01 / 05");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
+    const metrics = await works.first().evaluate((node) => ({ width: node.getBoundingClientRect().width, viewport: innerWidth, fit: getComputedStyle(node.querySelector("img")!).objectFit }));
+    expect(metrics.width).toBeGreaterThan((metrics.viewport - 60) * .77);
+    expect(metrics.width).toBeLessThan((metrics.viewport - 60) * .84);
+    expect(metrics.fit).toBe("contain");
+    const composition = await reel.evaluate((window) => {
+      const work = window.querySelector<HTMLElement>('.v21-gallery-mobile-item[data-index="0"]:not([data-clone])')!;
+      const next = window.querySelector<HTMLElement>('.v21-gallery-mobile-item[data-index="1"]:not([data-clone])')!;
+      const centered = Math.abs(work.getBoundingClientRect().left + work.clientWidth / 2 - innerWidth / 2);
+      const peek = innerWidth - 30 - next.getBoundingClientRect().left;
+      return { centered, peek, usable: innerWidth - 60 };
+    });
+    expect(composition.centered).toBeLessThanOrEqual(2);
+    expect(composition.peek).toBeGreaterThanOrEqual(composition.usable * .09);
+    expect(composition.peek).toBeLessThanOrEqual(composition.usable * .16);
+    for (const image of await works.locator("img").all()) {
+      const src = await image.getAttribute("src");
+      expect((await page.request.get(new URL(src!, page.url()).href)).ok()).toBe(true);
+    }
+    await gallery.getByRole("button", { name: "Next artwork" }).click();
+    await expect(gallery.locator(".v21-gallery-mobile-controls > span").first()).toHaveText("02 / 05");
+    await reel.focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(gallery.locator(".v21-gallery-mobile-controls > span").first()).toHaveText("03 / 05");
+    await expect(works.nth(2)).toContainText("Two-panel character sequence");
+    await expect(gallery.locator(".v21-gallery-mobile-controls")).not.toContainText(/Pause motion|Resume motion/);
+  }
+});
+
+test("mobile reel wraps at both ends and remains manually swipable in reduced motion", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const gallery = page.locator(".v21-gallery");
+  const reel = gallery.locator(".v21-gallery-mobile-window");
+  await reel.scrollIntoViewIfNeeded();
+  await gallery.getByRole("button", { name: "Previous artwork" }).click();
+  await expect(gallery.locator(".v21-gallery-mobile-controls > span").first()).toHaveText("05 / 05");
+  await gallery.getByRole("button", { name: "Next artwork" }).click();
+  await expect(gallery.locator(".v21-gallery-mobile-controls > span").first()).toHaveText("01 / 05");
+  await expect.poll(() => reel.evaluate((window) => {
+    const middle = window.getBoundingClientRect().left + window.clientWidth / 2;
+    const items = Array.from(window.querySelectorAll<HTMLElement>(".v21-gallery-mobile-item"));
+    const nearest = items.reduce((best, item) => Math.abs(item.getBoundingClientRect().left + item.clientWidth / 2 - middle) < Math.abs(best.getBoundingClientRect().left + best.clientWidth / 2 - middle) ? item : best, items[0]);
+    return nearest.dataset.clone ?? "real";
+  })).toBe("real");
+  expect(await reel.evaluate((node) => getComputedStyle(node).scrollSnapType)).toContain("mandatory");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
+});
+
+test("touch gestures allow horizontal artwork changes and vertical page scrolling", async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const page = await context.newPage();
+  try {
+    await page.goto("/");
+    const reel = page.locator(".v21-gallery-mobile-window");
+    await reel.scrollIntoViewIfNeeded();
+    const box = await reel.boundingBox();
+    if (!box) throw new Error("Mobile reel has no bounds");
+    const client = await context.newCDPSession(page);
+    async function touch(fromX: number, fromY: number, toX: number, toY: number) {
+      await client.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: fromX, y: fromY, id: 1 }] });
+      for (let step = 1; step <= 10; step++) {
+        await client.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: fromX + (toX - fromX) * step / 10, y: fromY + (toY - fromY) * step / 10, id: 1 }] });
+        await page.waitForTimeout(15);
+      }
+      await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    }
+    const y = box.y + box.height * .5;
+    await touch(box.x + box.width * .72, y, box.x + box.width * .28, y);
+    await expect.poll(async () => Number(await page.locator(".v21-gallery-mobile").getAttribute("data-active-index"))).toBeGreaterThan(1);
+    const verticalBefore = await page.evaluate(() => scrollY);
+    await touch(box.x + box.width * .5, y + 90, box.x + box.width * .5, y - 90);
+    await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(verticalBefore);
+    await touch(box.x + box.width * .68, y + 50, box.x + box.width * .32, y - 30);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
+  } finally {
+    await context.close();
   }
 });
 
