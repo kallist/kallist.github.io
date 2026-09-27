@@ -225,6 +225,12 @@ test("mobile reel wraps at both ends and remains manually swipable in reduced mo
   await expect(gallery.locator(".v21-gallery-mobile-controls > span").first()).toHaveText("05 / 05");
   await gallery.getByRole("button", { name: "Next artwork" }).click();
   await expect(gallery.locator(".v21-gallery-mobile-controls > span").first()).toHaveText("01 / 05");
+  await expect.poll(() => reel.evaluate((window) => {
+    const middle = window.getBoundingClientRect().left + window.clientWidth / 2;
+    const items = Array.from(window.querySelectorAll<HTMLElement>(".v21-gallery-mobile-item"));
+    const nearest = items.reduce((best, item) => Math.abs(item.getBoundingClientRect().left + item.clientWidth / 2 - middle) < Math.abs(best.getBoundingClientRect().left + best.clientWidth / 2 - middle) ? item : best, items[0]);
+    return nearest.dataset.clone ?? "real";
+  })).toBe("real");
   expect(await reel.evaluate((node) => getComputedStyle(node).scrollSnapType)).toContain("mandatory");
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
 import Image from "next/image";
 import { galleryWorks, type GalleryWork } from "@/content/gallery";
 import { homeCopy, type Language } from "@/content/home-copy";
@@ -57,7 +57,12 @@ function MobileGallery({ language }: { language: Language }) {
     const first = window?.querySelector<HTMLElement>('.v21-gallery-mobile-item[data-index="0"]:not([data-clone])');
     if (!window || !first) return;
     window.scrollLeft = positionFor(first, window);
-    const resize = new ResizeObserver(() => { window.scrollLeft = positionFor(window.querySelector<HTMLElement>(`.v21-gallery-mobile-item[data-index="${activeRef.current}"]:not([data-clone])`) ?? first, window); });
+    let width = window.clientWidth;
+    const resize = new ResizeObserver(() => {
+      if (window.clientWidth === width) return;
+      width = window.clientWidth;
+      window.scrollLeft = positionFor(window.querySelector<HTMLElement>(`.v21-gallery-mobile-item[data-index="${activeRef.current}"]:not([data-clone])`) ?? first, window);
+    });
     resize.observe(window);
     return () => { resize.disconnect(); if (settleRef.current) clearTimeout(settleRef.current); if (frameRef.current) cancelAnimationFrame(frameRef.current); };
   }, [positionFor]);
@@ -90,8 +95,9 @@ function MobileGallery({ language }: { language: Language }) {
     }
   }
 
-  return <div className="v21-gallery-mobile" data-active-index={activeIndex + 1}>
-    <div className="v21-gallery-mobile-window" ref={windowRef} role="region" aria-roledescription="artwork reel" aria-label={language === "zh" ? "视觉作品，左右滑动浏览" : "Visual works, swipe left or right"} tabIndex={0} onScroll={onScroll} onKeyDown={onKeyDown}>
+  const stageHeight = galleryWorks[activeIndex].shape === "portrait" ? "min(118vw, 470px)" : "min(76vw, 325px)";
+  return <div className="v21-gallery-mobile" data-active-index={activeIndex + 1} style={{ "--mobile-stage-height": stageHeight } as CSSProperties}>
+    <div className="v21-gallery-mobile-window" ref={windowRef} role="region" aria-roledescription={language === "zh" ? "作品画廊" : "artwork reel"} aria-label={language === "zh" ? "视觉作品，左右滑动浏览" : "Visual works, swipe left or right"} tabIndex={0} onScroll={onScroll} onKeyDown={onKeyDown}>
       <div className="v21-gallery-mobile-track">
         {reel.map((work, position) => {
           const clone = position === 0 || position === reel.length - 1;

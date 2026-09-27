@@ -2,7 +2,7 @@
 
 `node scripts/capture-mobile-gallery.mjs` captures the built static export in Chromium at `http://127.0.0.1:4173/`. These are browser viewport captures, not physical phone or production evidence.
 
-The mobile patch applies at 640px and below. The original two-track desktop artwork band remains in place at 768px and 1440px. A separate phone reel reads the same five works from `src/content/gallery.ts`. It uses native horizontal scrolling and CSS snap; a copy of the last and first works at the boundaries gives continuity, then the scroll position silently returns to the corresponding real work. The live index is calculated from the item nearest the viewport center. The phone reel has no automatic movement, including when reduced motion is requested. Keyboard arrows and 44px previous/next controls supplement touch swipe.
+The mobile patch applies at 640px and below. The original two-track desktop artwork band remains in place at 768px and 1440px. A separate phone reel reads the same five works from `src/content/gallery.ts`. It uses native horizontal scrolling and CSS snap; a copy of the last and first works at the boundaries gives continuity, then the scroll position silently returns to the corresponding real work. The live index is calculated from the item nearest the viewport center. The stage height follows the current work's portrait or landscape shape to avoid excess blank space, and the viewport clips tall neighboring previews. The phone reel has no automatic movement, including when reduced motion is requested. Keyboard arrows and 44px previous/next controls supplement touch swipe.
 
 | View | Files |
 | --- | --- |

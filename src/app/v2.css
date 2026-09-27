@@ -581,9 +581,9 @@ body:has(.v2-home) .site-footer { display: none; }
 @media (max-width: 640px) {
   .v21-gallery-window, .v21-gallery-bottomline { display: none; }
   .v21-gallery-mobile { display: block; --mobile-work-width: calc((100vw - 2 * var(--v2-rail)) * .78); }
-  .v21-gallery-mobile-window { position: relative; width: 100%; box-sizing: border-box; overflow-x: auto; overflow-y: hidden; overscroll-behavior-inline: contain; scroll-snap-type: x mandatory; scroll-padding-inline: calc((100vw - var(--mobile-work-width)) / 2); scrollbar-width: none; touch-action: pan-x pan-y; outline-offset: -5px; }
+  .v21-gallery-mobile-window { position: relative; width: 100%; height: var(--mobile-stage-height); box-sizing: border-box; overflow-x: auto; overflow-y: hidden; overscroll-behavior-inline: contain; scroll-snap-type: x mandatory; scroll-padding-inline: calc((100vw - var(--mobile-work-width)) / 2); scrollbar-width: none; touch-action: pan-x pan-y; outline-offset: -5px; transition: height .25s ease; }
   .v21-gallery-mobile-window::-webkit-scrollbar { display: none; }
-  .v21-gallery-mobile-track { display: flex; align-items: center; gap: 4px; width: max-content; min-height: min(116vw, 470px); padding-inline: calc((100vw - var(--mobile-work-width)) / 2); }
+  .v21-gallery-mobile-track { display: flex; align-items: center; gap: 4px; width: max-content; height: 100%; padding-inline: calc((100vw - var(--mobile-work-width)) / 2); }
   .v21-gallery-mobile-item { box-sizing: border-box; flex: 0 0 var(--mobile-work-width); width: var(--mobile-work-width); margin: 0; scroll-snap-align: center; scroll-snap-stop: always; }
   .v21-gallery-mobile-image { display: flex; align-items: center; justify-content: center; width: 100%; max-height: 370px; background: #e8e5de; box-shadow: 0 12px 26px rgba(35,32,27,.08); }
   .v21-gallery-mobile-image img { display: block; width: 100%; height: 100%; object-fit: contain; }
@@ -599,4 +599,7 @@ body:has(.v2-home) .site-footer { display: none; }
 }
 @media (max-width: 380px) {
   .v21-gallery-mobile-controls > span:nth-child(2) { display: none; }
+}
+@media (max-width: 640px) and (prefers-reduced-motion: reduce) {
+  .v21-gallery-mobile-window { transition: none; }
 }
