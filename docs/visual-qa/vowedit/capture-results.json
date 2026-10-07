@@ -1,0 +1,65 @@
+{
+  "url": "http://127.0.0.1:4173/",
+  "browser": "Automated Chromium",
+  "results": [
+    {
+      "width": 1440,
+      "homeOverflow": 0,
+      "detailOverflow": 0,
+      "errors": [],
+      "speculativePrefetch404": [
+        "/work/vowedit/__next.work.$d$slug.__PAGE__.txt",
+        "/work/repobound/__next.work.$d$slug.__PAGE__.txt",
+        "/work/cueparcel/__next.work.$d$slug.__PAGE__.txt",
+        "/work/agent-studio/__next.work.$d$slug.__PAGE__.txt",
+        "/work/skin-lesion-ai/__next.work.$d$slug.__PAGE__.txt",
+        "/resume/__next.resume.__PAGE__.txt"
+      ],
+      "directLoadAndRefresh": "PASS",
+      "indexEscapeFocusReturn": "PASS",
+      "headingHover": {
+        "before": {
+          "color": "rgb(27, 27, 24)",
+          "width": 427.375
+        },
+        "after": {
+          "color": "rgb(160, 84, 57)",
+          "width": 427.375
+        },
+        "status": "PASS"
+      }
+    },
+    {
+      "width": 390,
+      "homeOverflow": 0,
+      "detailOverflow": 0,
+      "errors": [],
+      "speculativePrefetch404": [
+        "/work/vowedit/__next.work.$d$slug.__PAGE__.txt",
+        "/work/repobound/__next.work.$d$slug.__PAGE__.txt",
+        "/work/cueparcel/__next.work.$d$slug.__PAGE__.txt",
+        "/work/agent-studio/__next.work.$d$slug.__PAGE__.txt",
+        "/work/skin-lesion-ai/__next.work.$d$slug.__PAGE__.txt",
+        "/resume/__next.resume.__PAGE__.txt"
+      ],
+      "directLoadAndRefresh": "PASS",
+      "indexEscapeFocusReturn": "PASS"
+    },
+    {
+      "width": 360,
+      "homeOverflow": 0,
+      "detailOverflow": 0,
+      "errors": [],
+      "speculativePrefetch404": [
+        "/work/vowedit/__next.work.$d$slug.__PAGE__.txt",
+        "/work/repobound/__next.work.$d$slug.__PAGE__.txt",
+        "/work/cueparcel/__next.work.$d$slug.__PAGE__.txt",
+        "/work/agent-studio/__next.work.$d$slug.__PAGE__.txt",
+        "/work/skin-lesion-ai/__next.work.$d$slug.__PAGE__.txt",
+        "/resume/__next.resume.__PAGE__.txt"
+      ],
+      "directLoadAndRefresh": "PASS",
+      "indexEscapeFocusReturn": "PASS"
+    }
+  ]
+}

@@ -13,3 +13,17 @@
 | Portrait is the owner's original visual practice | Visual | User supplied image and brief | User supplied; no independent provenance check |
 
 Claims not published: generalized token savings, live clinical fitness, customer deployments, real provider coverage, star/download numbers, and any unpublished visual works.
+
+## VowEdit — audited 2026-10-07
+
+Pinned snapshot: `8bb5c722bd8270b102f51cda9fa7f17b0bd991e4`, [merged PR #4](https://github.com/kallist/vowedit/pull/4). Public default branch remains `feat/vowedit-v0.1`; V0.3 links use the actual merged commit rather than assuming `main`.
+
+| Public claim | Primary source at pinned snapshot | Evidence boundary |
+| --- | --- | --- |
+| CHANGE / KEEP contract; three deterministic strategies and A/B/C; Ghost / Report | [Product README](https://github.com/kallist/vowedit/blob/8bb5c722bd8270b102f51cda9fa7f17b0bd991e4/README.md), [candidate plans](https://github.com/kallist/vowedit/blob/8bb5c722bd8270b102f51cda9fa7f17b0bd991e4/backend/candidate_plans.py) | Product workflow, not guaranteed editing quality. Safe / Balanced / Bold are strategy IDs; the captured UI labels them restrained / balanced / stronger change. |
+| Nine scoped MCP tools share a canonical draft; Agent requests cannot replace human approval | [Agent architecture](https://github.com/kallist/vowedit/blob/8bb5c722bd8270b102f51cda9fa7f17b0bd991e4/docs/AGENT.md), `backend/agent_services.py`, `backend/mcp_server.py` | Contract, generation, adopt and continue have separate approval boundaries. Web UI is the visible fallback; embedded MCP UI is not implemented. |
+| Complete V0.3 workflow tested with Mock | [V0.3 validation](https://github.com/kallist/vowedit/blob/8bb5c722bd8270b102f51cda9fa7f17b0bd991e4/docs/V0.3-VALIDATION.md), [local MCP evidence](https://github.com/kallist/vowedit/tree/8bb5c722bd8270b102f51cda9fa7f17b0bd991e4/docs/evidence/agent-v03) | Published source evidence; this portfolio task does not rerun VowEdit. Automated fixture approvals are not human creative-review proof. V0.3 RunningHub / ComfyUI real generation was not retested. |
+| Pixel preservation / drift metrics and Boundary Lock | [Validation boundary](https://github.com/kallist/vowedit/blob/8bb5c722bd8270b102f51cda9fa7f17b0bd991e4/docs/V0.3-VALIDATION.md) | Pixel metrics do not prove semantic adherence or subjective quality. Boundary Lock preservation is compositing, not a model preservation guarantee. |
+| Authentic shared-draft and Ghost / candidate screenshots | [Screenshot manifest](https://github.com/kallist/vowedit/blob/8bb5c722bd8270b102f51cda9fa7f17b0bd991e4/docs/evidence/agent-v03/README.md) | Project-owned Mock fixture; cropped and losslessly encoded. Provenance and hashes in asset inventory. |
+
+No commercial adoption, SaaS deployment, time savings or improved model success rate is claimed. V0.2 historical RunningHub pipeline evidence is not promoted to V0.3 provider coverage.

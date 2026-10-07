@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { WordHover } from "@/components/word-hover";
 import { homeCopy, type Language } from "@/content/home-copy";
+import { projects } from "@/content/projects";
 
 const chapters = [
   ["00", "navIntro", "hero"], ["01", "navWork", "work"],
@@ -95,6 +96,9 @@ export function ChapterNavigation({ language, onLanguageChange }: { language: La
           {chapters.map(([number, label, id]) => <a key={id} href={`#${id}`} aria-current={active === id ? "location" : undefined} onClick={close}><small>{number}</small><span><WordHover text={copy[label]} /></span><b aria-hidden="true">↗</b></a>)}
           <Link href="/resume/" onClick={close}><small>↗</small><span><WordHover text={copy.navResume} /></span><b aria-hidden="true">↗</b></Link>
         </nav>
+        <div className="v2-nav-projects" role="navigation" aria-label={language === "zh" ? "项目索引" : "Project index"}>
+          {projects.map((project) => <Link key={project.slug} href={`/work/${project.slug}/`} onClick={close}><small>{project.number}</small><span>{project.title}</span><b aria-hidden="true">↗</b></Link>)}
+        </div>
         <div className="v2-nav-foot"><span>{copy.navIndependent}</span><span>{copy.navEscape}</span></div>
       </div>
     </dialog>

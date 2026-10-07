@@ -50,6 +50,7 @@ export function AsciiContextLoop() {
     }));
     const maskNodes = [...document.querySelectorAll(
       ".v2-hero-name h1, .v2-hero-statement, .v2-hero-art, .v2-section-intro, .v2-case-media, " +
+      ".v2-vow-heading, .v2-vow-contract, .v2-vow-evidence, " +
       ".v2-repo-evidence, .v2-cue-heading, .v2-cue-flow, .v2-cue-evidence, " +
       ".v2-agent-heading, .v2-agent-coordinates, .v2-agent-evidence, " +
       ".v2-skin-heading, .v2-skin-values, .v2-skin-evidence, " +

@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test("homepage presents the real portrait and four ordered, reachable cases", async ({
+test("homepage presents the real portrait and five ordered, reachable cases", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -18,6 +18,7 @@ test("homepage presents the real portrait and four ordered, reachable cases", as
     ),
   ).toBe(true);
   await expect(page.locator(".v2-work article h3")).toHaveText([
+    /VowEdit/,
     /RepoBound/,
     /CueParcel/,
     /Agent Studio/,
@@ -25,7 +26,8 @@ test("homepage presents the real portrait and four ordered, reachable cases", as
   ]);
   await expect(
     page.getByRole("link", { name: /Explore case study/i }),
-  ).toHaveCount(4);
+  ).toHaveCount(5);
+  await expect(page.locator(".v2-case-count > span:first-child")).toHaveText(["01 / 05", "02 / 05", "03 / 05", "04 / 05", "05 / 05"]);
   await expect(
     page.getByRole("heading", { name: /kallist/i, level: 2 }),
   ).toBeVisible();
@@ -61,7 +63,7 @@ test("persistent rails, transparent fields and chapter overlay work by pointer a
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   await expect(page.locator(".v2-rail")).toHaveCount(2);
-  await expect(page.locator(".v2-pattern")).toHaveCount(9);
+  await expect(page.locator(".v2-pattern")).toHaveCount(10);
   await expect(page.locator('.v2-pattern[data-pattern="repobound"] .v2-pattern-row')).toHaveCount(30);
   const trigger = page.getByRole("button", { name: "Open chapter navigation" });
   await page.locator("#education").scrollIntoViewIfNeeded();
@@ -483,6 +485,7 @@ test("case studies deep load with real evidence links and honest captions", asyn
   page,
 }) => {
   for (const slug of [
+    "vowedit",
     "repobound",
     "cueparcel",
     "agent-studio",
@@ -541,7 +544,7 @@ test("phone-free resume prints and contact is a mailto", async ({ page }) => {
 test("mobile and tablet layouts stay within viewport, with touch navigation", async ({
   page,
 }) => {
-  for (const width of [375, 390, 430, 768]) {
+  for (const width of [360, 375, 390, 430, 768]) {
     await page.setViewportSize({ width, height: 840 });
     await page.goto("/");
     const dimensions = await page.evaluate(() => ({
@@ -664,5 +667,63 @@ test("keyboard skip link and case navigation work", async ({ page }) => {
     .first()
     .focus();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/\/work\/repobound\/$/);
+  await expect(page).toHaveURL(/\/work\/vowedit\/$/);
+});
+
+test("VowEdit is reachable through the project index and preserves next-case ordering", async ({ page }) => {
+  const order = ["vowedit", "repobound", "cueparcel", "agent-studio", "skin-lesion-ai"];
+  await page.goto("/");
+  await page.getByRole("button", { name: "Open chapter navigation" }).click();
+  const index = page.getByRole("navigation", { name: "Project index" });
+  await expect(index.getByRole("link")).toHaveCount(5);
+  await index.getByRole("link", { name: /VowEdit/ }).click();
+  for (let i = 0; i < order.length; i++) {
+    await expect(page).toHaveURL(new RegExp(`/work/${order[i]}/$`));
+    await expect(page.locator(".case-breadcrumb span")).toHaveText(`0${i + 1} / 05`);
+    await page.locator(".next-project a").click();
+  }
+  await expect(page).toHaveURL(/\/work\/vowedit\/$/);
+  await page.reload();
+  await expect(page.locator("h1")).toHaveText("VowEdit.");
+});
+
+test("VowEdit explains the contract, candidate strategies and human boundary at desktop and mobile widths", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const width of [1440, 390, 360]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const scene = page.locator("#vowedit");
+    await scene.scrollIntoViewIfNeeded();
+    await expect(scene.getByRole("heading", { name: "VowEdit", exact: true })).toBeVisible();
+    await expect(scene.getByText("CHANGE", { exact: true })).toBeVisible();
+    await expect(scene.getByText("KEEP", { exact: true })).toBeVisible();
+    await expect(scene).toContainText("Human approves");
+    await expect(scene.locator("figcaption")).toContainText("Mock pixel simulation");
+    const image = scene.getByRole("img");
+    await image.scrollIntoViewIfNeeded();
+    await expect.poll(() => image.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0)).toBe(true);
+    const bounds = await image.boundingBox();
+    expect(bounds?.x).toBeGreaterThanOrEqual(width > 700 ? 48 : 30);
+    expect((bounds?.x ?? 0) + (bounds?.width ?? 0)).toBeLessThanOrEqual(width - (width > 700 ? 48 : 30));
+    await page.goto("/work/vowedit/");
+    await expect(page.getByRole("list", { name: "VowEdit workflow" }).getByRole("listitem")).toHaveCount(8);
+    await expect(page.locator(".case-article")).toContainText("Safe, Balanced and Bold");
+    await expect(page.locator(".case-article")).toContainText("Agent cannot approve");
+    await expect(page.locator(".limitation")).toContainText("real-provider generation was not retested");
+    await expect(page.locator(".limitation")).toContainText("compositing");
+    await expect(page.locator(".limitation")).toContainText("Embedded MCP UI is not implemented");
+    for (const screenshot of await page.locator(".project-figure img").all()) {
+      await screenshot.scrollIntoViewIfNeeded();
+      await expect.poll(() => screenshot.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0)).toBe(true);
+    }
+    await expect(page.locator(".evidence-list a")).toHaveCount(4);
+    await page.locator(".evidence-list a").first().focus();
+    await expect(page.locator(".evidence-list a").first()).toBeFocused();
+    expect(await page.locator(".evidence-list a").first().evaluate(node => getComputedStyle(node).outlineStyle)).not.toBe("none");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
+  }
+  await page.goto("/");
+  await page.getByRole("button", { name: "中文", exact: true }).click();
+  await expect(page.locator("#vowedit")).toContainText("人独立审批");
+  await expect(page.locator("#vowedit figcaption")).toContainText("Mock 像素模拟");
 });

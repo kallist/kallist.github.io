@@ -22,6 +22,8 @@ npm run e2e
 
 Project facts are in `src/content/projects.ts`. Source references, decisions and asset origins are in `docs/`. Images in `public/projects/` are copied from pinned public repository commits. The original supplied self portrait is in `assets/`; a WebP encoding of the same drawing is served in `public/portrait/`. The public resume is an HTML route with browser print styling and an inspected, phone-free PDF download. The private/source resume PDFs are deliberately excluded.
 
+Featured project order: VowEdit, RepoBound, CueParcel, Agent Studio, Skin Lesion AI Platform. VowEdit adds a data-driven workflow strip to the shared case-study template; its screenshots are explicitly labelled Mock UI crops. Evidence links are pinned to the merged V0.3 snapshot because the source repository default branch is older. See the asset inventory and evidence matrix for provenance and limits.
+
 The V2 homepage uses fixed measurement rails, a chapter overlay, transparent character fields and a numeric drawing of the university gate. V2.3.1 refines the deterministic Canvas 2D ASCII context loop into a single flowing Möbius strip; see its [design](docs/V231_MOBIUS_RIBBON_DESIGN.md), [review](docs/V231_MOBIUS_RIBBON_REVIEW.md) and [visual QA](docs/visual-qa/v231/README.md). The [V2.3 design](docs/V23_CONTEXT_LOOP_DESIGN.md), [V2 design system](docs/V2_DESIGN_SYSTEM.md), [reference audit](docs/V2_REFERENCE_AUDIT.md), [asset inventory](docs/ASSET_INVENTORY.md), [V2.2 tree design](docs/V22_LIVING_TREE_DESIGN.md) and [V2 visual QA](docs/visual-qa/v2/README.md) remain as history.
 
 ## Deployment

@@ -8,6 +8,7 @@ const root = fileURLToPath(new URL("../out/", import.meta.url));
 const routes = [
   "index.html",
   "resume/index.html",
+  "work/vowedit/index.html",
   "work/repobound/index.html",
   "work/cueparcel/index.html",
   "work/agent-studio/index.html",
@@ -35,6 +36,8 @@ test("export contains the real portrait, pinned project images and SEO files", (
     "gallery/comic-triptych.webp",
     "gallery/riverside-ink.webp",
     "projects/repobound-hero.png",
+    "projects/vowedit-workbench.webp",
+    "projects/vowedit-agent-report.webp",
     "projects/cueparcel-lens.png",
     "projects/agent-studio-trace.png",
     "projects/skin-lesion-result.png",
@@ -45,6 +48,16 @@ test("export contains the real portrait, pinned project images and SEO files", (
   ]) {
     assert.ok(existsSync(join(root, path)), `missing ${path}`);
   }
+});
+
+test("VowEdit exports the human-controlled flow and pinned V0.3 evidence without model-success claims", () => {
+  const html = readFileSync(join(root, "work/vowedit/index.html"), "utf8");
+  for (const text of ["CHANGE / KEEP", "Human approval", "Human review", "Safe, Balanced and Bold", "Mock pixel simulation", "Agent cannot approve", "compositing", "Embedded MCP UI is not implemented"]) assert.ok(html.includes(text), text);
+  assert.match(html, /8bb5c722bd8270b102f51cda9fa7f17b0bd991e4\/docs\/AGENT\.md/);
+  assert.match(html, /8bb5c722bd8270b102f51cda9fa7f17b0bd991e4\/docs\/V0\.3-VALIDATION\.md/);
+  assert.match(readFileSync(join(root, "sitemap.xml"), "utf8"), /\/work\/vowedit\//);
+  assert.match(html, /href="\/work\/repobound\/"/);
+  assert.match(readFileSync(join(root, "work/skin-lesion-ai/index.html"), "utf8"), /href="\/work\/vowedit\/"/);
 });
 
 function publicFiles(dir) {
