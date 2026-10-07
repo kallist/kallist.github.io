@@ -9,6 +9,8 @@ type Props = {
 };
 
 const imageDimensions: Record<string, { width: number; height: number }> = {
+  "/projects/vowedit-workbench.webp": { width: 1440, height: 1440 },
+  "/projects/vowedit-agent-report.webp": { width: 1000, height: 1570 },
   "/projects/repobound-hero.png": { width: 1512, height: 982 },
   "/projects/repobound-context.png": { width: 1512, height: 982 },
   "/projects/cueparcel-lens.png": { width: 1280, height: 800 },

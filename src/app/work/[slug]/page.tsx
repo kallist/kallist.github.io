@@ -42,11 +42,16 @@ export default async function CaseStudy({
     projects[
       (projects.findIndex((item) => item.slug === slug) + 1) % projects.length
     ];
+  const secondImage = project.secondImage ? <ProjectImage
+    src={project.secondImage}
+    alt={project.secondImageAlt ?? "Additional project screenshot"}
+    caption={project.secondImageCaption ?? `Additional authentic ${project.title} repository screenshot.`}
+  /> : null;
   return (
     <main id="main" className="case-main">
       <div className="shell case-breadcrumb">
         <Link href="/#work">← All work</Link>
-        <span>{project.number} / 04</span>
+        <span>{project.number} / {String(projects.length).padStart(2, "0")}</span>
       </div>
       <header className="shell case-hero">
         <p className="section-index">
@@ -69,6 +74,11 @@ export default async function CaseStudy({
           <span>Source-backed engineering case</span>
         </div>
       </header>
+      {project.flow && (
+        <ol className="shell case-flow" aria-label={`${project.title} workflow`}>
+          {project.flow.map((step, index) => <li key={step.title}><small>{String(index + 1).padStart(2, "0")}</small><strong>{step.title}</strong><span>{step.detail}</span></li>)}
+        </ol>
+      )}
       <div className="shell">
         <ProjectImage
           src={project.image}
@@ -105,6 +115,7 @@ export default async function CaseStudy({
               ))}
             </ol>
           </section>
+          {project.secondImagePlacement === "approach" && secondImage}
           <section>
             <p className="section-index">03 / RESULT & BOUNDARY</p>
             <h2>What the evidence says.</h2>
@@ -123,13 +134,7 @@ export default async function CaseStudy({
               <strong>Boundary.</strong> {project.limit}
             </p>
           </section>
-          {project.secondImage && (
-            <ProjectImage
-              src={project.secondImage}
-              alt={project.secondImageAlt ?? "Additional project screenshot"}
-              caption={`Additional authentic ${project.title} repository screenshot.`}
-            />
-          )}
+          {project.secondImagePlacement !== "approach" && secondImage}
           <section>
             <p className="section-index">04 / OPEN THE EVIDENCE</p>
             <h2>Follow the source.</h2>

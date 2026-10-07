@@ -339,6 +339,48 @@ body:has(.v2-home) .site-footer { display: none; }
 .v2-scene .v2-case-link { margin-top: 12px; }
 
 /* RepoBound: a source block with the image registered to its right edge. */
+.v2-vow-scene { background: rgba(238,234,226,.7); }
+.v2-vow-layout { display: grid; grid-template-columns: minmax(0, .65fr) minmax(0, 1.35fr); gap: 0 clamp(28px, 4vw, 64px); padding-bottom: 55px; }
+.v2-vow-layout .v2-case-count { align-self: stretch; }
+.v2-vow-heading { grid-column: 1 / -1; display: flex; align-items: end; justify-content: space-between; gap: 35px; padding: 48px 0 38px; }
+.v2-vow-heading h3 { margin: 0; font-size: clamp(76px, 9vw, 138px); }
+.v2-case .v2-vow-heading h3 > .v2-word { display: inline-block; padding-left: 0; font-style: normal; }
+.v2-vow-heading .v2-case-lead { max-width: 330px; padding-bottom: 4px; }
+.v2-vow-story { grid-column: 1; grid-row: 3; background: rgba(238,234,226,.94); }
+.v2-vow-contract { border-top: 1px solid var(--v2-ink); }
+.v2-vow-contract > div { padding: 22px 0; border-bottom: 1px solid var(--v2-line); }
+.v2-vow-contract small { display: block; font: 10px "Courier New", monospace; letter-spacing: .1em; }
+.v2-vow-contract strong { display: block; font: 40px/1.1 var(--serif); letter-spacing: -.04em; margin: 12px 0 8px; }
+.v2-vow-contract > div > span { font-size: 14px; }
+.v2-vow-contract > p { display: flex; flex-wrap: wrap; gap: 9px; padding: 20px 0; font: 12px/1.5 "Courier New", monospace; }
+.v2-vow-contract > p > span[aria-hidden] { color: var(--v2-rust); }
+.v2-vow-media { grid-column: 2; grid-row: 3; }
+.v2-scene.v2-vow-scene .v2-vow-media img { width: 100%; aspect-ratio: 1; object-fit: contain; filter: none; }
+.v2-vow-evidence { padding-top: 20px; padding-bottom: 28px; }
+.v2-vow-evidence > p { font: 17px/1.5 var(--serif); }
+.v2-vow-evidence > span { display: block; font: 10px/1.7 "Courier New", monospace; margin-top: 20px; }
+.v2-nav-projects { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; border-top: 1px solid #8b887e; margin-top: 25px; }
+.v2-nav-projects a { display: grid; grid-template-columns: 25px minmax(0, 1fr) 18px; align-items: center; gap: 8px; min-height: 44px; padding: 10px 0; border-bottom: 1px solid #55544f; font: 15px/1.4 var(--serif); color: #eeeae2; }
+.v2-nav-projects :is(small, b) { font: 10px "Courier New", monospace; }
+.v2-nav-projects a:hover { color: #d6a288; }
+@media (max-width: 1000px) {
+  .v2-vow-layout { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); }
+  .v2-vow-heading h3 { font-size: clamp(65px, 9vw, 95px); }
+}
+@media (max-width: 700px) {
+  .v2-vow-layout { display: flex; flex-direction: column; gap: 0; padding-bottom: 45px; }
+  .v2-vow-heading { display: block; padding: 40px 0 28px; }
+  .v2-vow-heading h3 { font-size: clamp(48px, 14vw, 78px); margin: 0 0 22px; }
+  .v2-vow-heading .v2-case-lead { font-size: 21px; }
+  .v2-vow-contract { display: grid; grid-template-columns: 1fr 1fr; column-gap: 14px; }
+  .v2-vow-contract strong { font-size: 27px; margin: 9px 0 7px; }
+  .v2-vow-contract > div { padding: 15px 0; }
+  .v2-vow-contract > div > span { font-size: 12px; }
+  .v2-vow-contract > p { grid-column: 1 / -1; padding: 15px 0 22px; }
+  .v2-vow-evidence { padding-top: 22px; }
+  .v2-nav-projects { grid-template-columns: 1fr; margin-top: 22px; }
+}
+
 .v2-repo-scene { background: rgba(222,219,210,.58); }
 .v2-repo-layout { min-height: 875px; display: grid; grid-template-columns: minmax(260px, .75fr) minmax(0, 1.25fr); grid-template-rows: auto 1fr auto; column-gap: clamp(24px, 4vw, 70px); align-items: center; }
 .v2-repo-layout .v2-case-count { grid-column: 1 / -1; }

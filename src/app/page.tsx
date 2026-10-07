@@ -12,7 +12,7 @@ import { GalleryRibbon } from "@/components/gallery-ribbon";
 import { projects } from "@/content/projects";
 import { homeCopy, type Language } from "@/content/home-copy";
 
-const [repobound, cueparcel, agentStudio, skinLesion] = projects;
+const [vowedit, repobound, cueparcel, agentStudio, skinLesion] = projects;
 
 function ChapterMark({ number, title }: { number: string; title: string }) {
   return <div className="v2-chapter-mark v2-reveal"><span>{number} / <WordHover text={title} /></span><span aria-hidden="true">+ — + — + — +</span></div>;
@@ -58,15 +58,33 @@ export default function Home() {
         <div className="v2-section-intro v2-reveal"><h2 id="work-title"><WordHover text={copy.workHeadingA} />{language === "en" ? " " : null}<em><WordHover text={copy.workHeadingB} /></em></h2><p><WordHover text={copy.workIntro} /></p></div>
       </div>
 
+      <article id="vowedit" className="v2-case v2-vow-scene v2-field-host v2-scene" aria-labelledby="vowedit-title">
+        <SectionPattern kind="agent" />
+        <div className="v2-scene-guides" aria-hidden="true" />
+        <div className="v2-frame v2-vow-layout">
+          <div className="v2-case-count"><span>{vowedit.number} / 05</span><span>{copy.vowKicker}</span></div>
+          <div className="v2-vow-heading v2-reveal"><h3 id="vowedit-title"><WordHover text="VowEdit" /></h3><p className="v2-case-lead"><WordHover text={copy.vowSummary} /></p></div>
+          <div className="v2-vow-story">
+            <div className="v2-vow-contract v2-reveal" aria-label={language === "zh" ? "编辑契约" : "Editing contract"}>
+            <div><small>01 / BOUNDARY</small><strong>CHANGE</strong><span>{copy.vowChange}</span></div>
+            <div><small>02 / BOUNDARY</small><strong>KEEP</strong><span>{copy.vowKeep}</span></div>
+            <p><WordHover text={copy.vowAgent} /><span aria-hidden="true">→</span><WordHover text={copy.vowHuman} /></p>
+            </div>
+            <div className="v2-vow-evidence v2-reveal"><p><WordHover text={copy.vowProblem} /></p><span>{copy.vowEvaluation}</span><CaseLink slug={vowedit.slug} label={copy.caseLink} /></div>
+          </div>
+          <div className="v2-vow-media v2-case-media v2-reveal"><ProjectImage src={vowedit.image} alt={vowedit.imageAlt} caption={copy.vowImageCaption} linkLabel={copy.imageLink} /></div>
+        </div>
+      </article>
+
       <article className="v2-case v2-repo-scene v2-field-host v2-scene" aria-labelledby="repobound-title">
         <SectionPattern kind="repobound" />
         <div className="v2-scene-guides" aria-hidden="true" />
         <div className="v2-frame v2-repo-layout">
-          <div className="v2-case-count"><span>01 / 04</span><span>{copy.repoKicker}</span></div>
+          <div className="v2-case-count"><span>{repobound.number} / 05</span><span>{copy.repoKicker}</span></div>
           <h3 id="repobound-title" className="v2-reveal"><WordHover text="Repo" /><span><WordHover text="Bound" /></span></h3>
           <div className="v2-repo-media v2-case-media v2-reveal"><ProjectImage src={repobound.image} alt={repobound.imageAlt} caption={copy.repoImageCaption} linkLabel={copy.imageLink} /></div>
           <div className="v2-repo-evidence v2-reveal"><p className="v2-case-lead"><WordHover text={copy.repoSummary} /></p><p><WordHover text={copy.repoProblem} /></p><CaseLink slug={repobound.slug} label={copy.caseLink} /></div>
-          <span className="v2-scene-coordinate" aria-hidden="true">X:01 / CONTEXT FIELD</span>
+          <span className="v2-scene-coordinate" aria-hidden="true">X:02 / CONTEXT FIELD</span>
         </div>
       </article>
 
@@ -74,7 +92,7 @@ export default function Home() {
         <SectionPattern kind="cueparcel" />
         <div className="v2-scene-guides" aria-hidden="true" />
         <div className="v2-frame v2-cue-layout">
-          <div className="v2-case-count"><span>02 / 04</span><span>{copy.cueKicker}</span></div>
+          <div className="v2-case-count"><span>{cueparcel.number} / 05</span><span>{copy.cueKicker}</span></div>
           <div className="v2-cue-heading v2-reveal"><h3 id="cueparcel-title"><WordHover text="Cue" /><em><WordHover text="Parcel" /></em></h3><p className="v2-case-lead"><WordHover text={copy.cueSummary} /></p></div>
           <ol className="v2-cue-flow v2-reveal" aria-label="CueParcel workflow">{[copy.cuePick, copy.cueCart, copy.cueRecipe, copy.cueTaskSpec, copy.cueReceipt].map((step, index) => <li key={index}><small>0{index + 1}</small><strong><WordHover text={step} /></strong><span aria-hidden="true">↗</span></li>)}</ol>
           <div className="v2-cue-media v2-case-media v2-reveal"><ProjectImage src={cueparcel.image} alt={cueparcel.imageAlt} caption={copy.cueImageCaption} linkLabel={copy.imageLink} /></div>
@@ -86,7 +104,7 @@ export default function Home() {
         <SectionPattern kind="agent" />
         <div className="v2-scene-guides" aria-hidden="true" />
         <div className="v2-frame v2-agent-layout">
-          <div className="v2-case-count"><span>03 / 04</span><span>{copy.agentKicker}</span></div>
+          <div className="v2-case-count"><span>{agentStudio.number} / 05</span><span>{copy.agentKicker}</span></div>
           <div className="v2-agent-heading v2-reveal"><h3 id="agent-title"><WordHover text="Agent" /> <em><WordHover text="Studio" /></em></h3><p className="v2-case-lead"><WordHover text={copy.agentSummary} /></p></div>
           <ol className="v2-agent-coordinates v2-reveal" aria-label="Agent Studio architecture">{["RUN", "TOOL", "RAG", "MEMORY", "TRACE", "EVAL"].map((step, index) => <li key={step}><small>0{index + 1}</small><strong><WordHover text={step} /></strong></li>)}</ol>
           <div className="v2-agent-media v2-case-media v2-reveal"><ProjectImage src={agentStudio.image} alt={agentStudio.imageAlt} caption={copy.agentImageCaption} linkLabel={copy.imageLink} /></div>
@@ -98,7 +116,7 @@ export default function Home() {
         <SectionPattern kind="skin" />
         <div className="v2-scene-guides" aria-hidden="true" />
         <div className="v2-frame v2-skin-layout">
-          <div className="v2-case-count"><span>04 / 04</span><span>{copy.skinKicker}</span></div>
+          <div className="v2-case-count"><span>{skinLesion.number} / 05</span><span>{copy.skinKicker}</span></div>
           <div className="v2-skin-heading v2-reveal"><h3 id="skin-title"><WordHover text="Skin Lesion" /> <em><WordHover text="AI Platform" /></em></h3><p><WordHover text={copy.skinSummary} /></p></div>
           <div className="v2-skin-values v2-reveal" aria-label={language === "zh" ? "存档评估结果" : "Stored evaluation results"}>{skinLesion.metrics?.map((metric, index) => <div key={metric.label}><small>0{index + 1} / EVAL</small><strong><WordHover text={metric.value} /></strong><span><WordHover text={[copy.metricInternal, copy.metricExternal, copy.metricRecall][index]} /></span></div>)}</div>
           <div className="v2-skin-media v2-case-media v2-reveal"><ProjectImage src={skinLesion.image} alt={skinLesion.imageAlt} caption={copy.skinImageCaption} linkLabel={copy.imageLink} /></div>
