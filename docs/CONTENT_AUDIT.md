@@ -1,5 +1,7 @@
 # Content audit — 2026-09-23
 
+Historical audit below. Current (2026-10-22) order is VowEdit, RepoBound, CueParcel, Agent Studio, Skin Lesion AI Platform; five supplied gallery works and three supplied films are now present. See the evidence matrix, film asset provenance and cinematic design record for current additions. Older descriptions of four projects or a single portrait describe the initial version, not the present site.
+
 ## Sources reviewed
 
 - User supplied portfolio brief and self portrait.

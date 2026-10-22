@@ -71,7 +71,7 @@ test("persistent rails, transparent fields and chapter overlay work by pointer a
   await trigger.click();
   const dialog = page.getByRole("dialog", { name: "Chapters" });
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByRole("navigation", { name: "Chapter navigation" }).getByRole("link")).toHaveCount(7);
+  await expect(dialog.getByRole("navigation", { name: "Chapter navigation" }).getByRole("link")).toHaveCount(8);
   await expect(dialog.locator('a[href="#education"]')).toHaveAttribute("aria-current", "location");
   await dialog.locator('a[href="#work"]').hover();
   await expect.poll(async () => dialog.locator('a[href="#work"] b').evaluate((node) => getComputedStyle(node).transform)).not.toBe("none");
@@ -358,6 +358,8 @@ test("ASCII context loop stays behind readable content and becomes static in red
   await expect.poll(() => projectImage.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0)).toBe(true);
   await expect(page.locator(".v2-repo-media")).toHaveClass(/v2-in-view/);
   await expect.poll(() => page.locator(".v2-repo-media").evaluate((node) => getComputedStyle(node).clipPath)).toBe("inset(0px)");
+  await expect.poll(() => page.locator(".v2-repo-media").evaluate((node) => getComputedStyle(node).transform)).toBe("none");
+  await expect(page.locator(".v2-repo-media")).toHaveCSS("opacity", "1");
   const box = await projectImage.boundingBox();
   if (!box) throw new Error("Project image has no bounds");
   // The translucent 1px border intentionally reveals its background; compare
@@ -370,7 +372,7 @@ test("ASCII context loop stays behind readable content and becomes static in red
   await expect(loop).toHaveAttribute("data-loop-motion", "running");
 });
 
-test("loop arrives before hero and remains fixed through the final chapter", async ({ page }) => {
+test("hero no longer waits for a loop intro and the loop remains fixed through the final chapter", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.addInitScript(() => {
     const timeline = { firstGlyph: 0, heroStart: 0 };
@@ -391,7 +393,11 @@ test("loop arrives before hero and remains fixed through the final chapter", asy
   await expect(hero).toHaveCSS("opacity", "1");
   const timeline = await page.evaluate(() => (window as unknown as { __loopTimeline: { firstGlyph: number; heroStart: number } }).__loopTimeline);
   expect(timeline.firstGlyph).toBeGreaterThan(0);
-  expect(timeline.heroStart).toBeGreaterThan(timeline.firstGlyph);
+  // The recruitment path must arrive without waiting for the decorative loop.
+  expect(timeline.heroStart).toBeGreaterThan(0);
+  expect(timeline.heroStart - timeline.firstGlyph).toBeLessThan(1000);
+  expect(await hero.evaluate(node => Number.parseFloat(getComputedStyle(node).animationDelay))).toBeLessThanOrEqual(.25);
+  await expect(page.locator(".v3-hero-actions").getByRole("link", { name: /^Resume/ })).toBeInViewport();
   await page.locator("#contact").scrollIntoViewIfNeeded();
   await expect(loop).toBeInViewport();
   expect(await loop.evaluate((node) => getComputedStyle(node).position)).toBe("fixed");

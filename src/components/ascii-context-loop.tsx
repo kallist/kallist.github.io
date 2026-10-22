@@ -37,19 +37,20 @@ export function AsciiContextLoop() {
     host.dataset.glyphCount = String(model.glyphs.length);
 
     const chapters = [
+      ["#films", "films", true, .22],
       [".v2-cue-scene", "cue", true, .48],
       ["#education", "education", true, .30],
       ["#contact", "contact", true, .58],
       ["#visual", "visual", false, .53],
-      ["#profile", "profile", false, .68],
-      ["#work", "work", false, .78],
-      ["#hero", "hero", false, 1],
+      ["#profile", "profile", false, .34],
+      ["#work", "work", false, .42],
+      ["#hero", "hero", false, .58],
     ] as const;
     const chapterNodes = chapters.map(([selector, zone, dark, strength]) => ({
       element: document.querySelector(selector), zone, dark, strength,
     }));
     const maskNodes = [...document.querySelectorAll(
-      ".v2-hero-name h1, .v2-hero-statement, .v2-hero-art, .v2-section-intro, .v2-case-media, " +
+      ".v2-hero-name h1, .v2-hero-name .v2-index, .v2-hero-statement, .v2-hero-art, .v3-hero-summary, .v3-work-index, .v3-films-head, .v3-film-stage, .v2-section-intro, .v2-case-media, " +
       ".v2-vow-heading, .v2-vow-contract, .v2-vow-evidence, " +
       ".v2-repo-evidence, .v2-cue-heading, .v2-cue-flow, .v2-cue-evidence, " +
       ".v2-agent-heading, .v2-agent-coordinates, .v2-agent-evidence, " +

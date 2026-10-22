@@ -2,6 +2,7 @@ export type Project = {
   slug: string;
   number: string;
   title: string;
+  role: string;
   kicker: string;
   summary: string;
   problem: string;
@@ -28,6 +29,7 @@ export const projects: Project[] = [
     slug: "vowedit",
     number: "01",
     title: "VowEdit",
+    role: "Independent engineering practice / product workflow & Agent integration",
     kicker: "Agent-controlled image re-editing",
     summary: "Change what you ask. Keep what you don’t.",
     problem: "AI image editing often changes more than the user asked for: a local correction can also alter a face, background, composition or lighting. VowEdit makes the intended change and the protected regions explicit, then keeps the result open to inspection and human control.",
@@ -71,6 +73,7 @@ export const projects: Project[] = [
     slug: "repobound",
     number: "02",
     title: "RepoBound",
+    role: "Independent engineering practice / context workflow & interface",
     kicker: "Repository context engineering",
     summary: "See and control the repository context a coding agent receives.",
     problem:
@@ -113,6 +116,7 @@ export const projects: Project[] = [
     slug: "cueparcel",
     number: "03",
     title: "CueParcel",
+    role: "Independent engineering practice / browser product & context delivery",
     kicker: "Web context workbench",
     summary:
       "Pick, organize and deliver webpage context with its source still visible.",
@@ -156,6 +160,7 @@ export const projects: Project[] = [
     slug: "agent-studio",
     number: "04",
     title: "Agent Studio",
+    role: "Independent engineering practice / Agent runtime & execution evidence",
     kicker: "Agent runtime and evaluation",
     summary:
       "Build, run and inspect tool-using agents from the same execution evidence.",
@@ -192,6 +197,7 @@ export const projects: Project[] = [
     slug: "skin-lesion-ai",
     number: "05",
     title: "Skin Lesion AI Platform",
+    role: "AI Engineer Intern / local application engineering",
     kicker: "Internship engineering practice",
     summary:
       "From a model experiment to a local inference workflow with a visible evaluation boundary.",

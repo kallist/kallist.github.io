@@ -4,6 +4,7 @@ import { SiteFooter } from "@/components/site-footer";
 import "./globals.css";
 import "./v11.css";
 import "./v2.css";
+import "./cinematic.css";
 
 const siteUrl = "https://kallist.github.io";
 

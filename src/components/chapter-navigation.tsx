@@ -8,8 +8,8 @@ import { projects } from "@/content/projects";
 
 const chapters = [
   ["00", "navIntro", "hero"], ["01", "navWork", "work"],
-  ["02", "navEducation", "education"], ["03", "navMethod", "profile"],
-  ["04", "navVisual", "visual"], ["05", "navContact", "contact"],
+  ["02", "navFilms", "films"], ["03", "navEducation", "education"], ["04", "navMethod", "profile"],
+  ["05", "navVisual", "visual"], ["06", "navContact", "contact"],
 ] as const;
 
 function LanguageSwitch({ language, onChange, inDialog = false, chapter }: { language: Language; onChange: (language: Language) => void; inDialog?: boolean; chapter?: string }) {
@@ -74,7 +74,7 @@ export function ChapterNavigation({ language, onLanguageChange }: { language: La
   const close = () => dialog.current?.close();
 
   return <>
-    <div className="v2-rail v2-rail-left" aria-hidden="true"><span className="v2-rail-folio">00 / 05</span></div>
+    <div className="v2-rail v2-rail-left" aria-hidden="true"><span className="v2-rail-folio">00 / 06</span></div>
     <div className="v2-rail v2-rail-right" aria-hidden="true">
       <span className="v2-rail-folio">K / 2026</span>
       <span ref={progressReadout} className="v2-progress-readout">00%</span>
@@ -87,7 +87,7 @@ export function ChapterNavigation({ language, onLanguageChange }: { language: La
       <span className="v2-nav-label">{copy.navIndex}</span>
     </button>
     <dialog ref={dialog} className="v2-nav-dialog" aria-labelledby="v2-nav-title" onClick={(event) => { if (event.target === dialog.current) close(); }}>
-      <div className="v2-overlay-rail v2-overlay-rail-left" aria-hidden="true"><span>INDEX / 00—05</span></div>
+      <div className="v2-overlay-rail v2-overlay-rail-left" aria-hidden="true"><span>INDEX / 00—06</span></div>
       <div className="v2-overlay-rail v2-overlay-rail-right" aria-hidden="true"><span>{String(chapters.findIndex(([, , id]) => id === active)).padStart(2, "0")} / ACTIVE</span></div>
       <div className="v2-nav-panel">
         <div className="v2-nav-head"><span>kallist / {copy.navIndex}</span><LanguageSwitch language={language} onChange={onLanguageChange} inDialog /><button type="button" onClick={close} aria-label={copy.navClose}>{language === "zh" ? "关闭" : "Close"} <span aria-hidden="true">×</span></button></div>
