@@ -73,6 +73,7 @@ export default async function CaseStudy({
           </a>
           <span>Source-backed engineering case</span>
         </div>
+        <dl className="case-at-a-glance"><div><dt>Role & scope</dt><dd>{project.role}</dd></div><div><dt>Engineering focus</dt><dd>{project.capabilities.join(" / ")}</dd></div></dl>
       </header>
       {project.flow && (
         <ol className="shell case-flow" aria-label={`${project.title} workflow`}>
@@ -93,7 +94,7 @@ export default async function CaseStudy({
           <span className="section-index">THE SYSTEM</span>
           <dl>
             <dt>Role</dt>
-            <dd>Project owner / engineering practice</dd>
+            <dd>{project.role}</dd>
             <dt>Focus</dt>
             <dd>{project.kicker}</dd>
             <dt>Stack</dt>

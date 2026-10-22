@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync, existsSync, readdirSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -58,6 +58,18 @@ test("VowEdit exports the human-controlled flow and pinned V0.3 evidence without
   assert.match(readFileSync(join(root, "sitemap.xml"), "utf8"), /\/work\/vowedit\//);
   assert.match(html, /href="\/work\/repobound\/"/);
   assert.match(readFileSync(join(root, "work/skin-lesion-ai/index.html"), "utf8"), /href="\/work\/vowedit\/"/);
+});
+
+test("three supplied films export without an eager video source and remain bounded web assets", () => {
+  const home = readFileSync(join(root, "index.html"), "utf8");
+  assert.ok(home.includes('id="films"'));
+  assert.doesNotMatch(home, /<video\b/);
+  for (const slug of ["cueparcel-cinematic", "qingming-comparison", "singularity-study"]) {
+    for (const extension of ["mp4", "webp"]) assert.ok(existsSync(join(root, `films/${slug}.${extension}`)));
+    assert.ok(statSync(join(root, `films/${slug}.mp4`)).size < 100 * 1024 * 1024, `${slug} exceeds GitHub's per-file limit`);
+  }
+  assert.match(home, /Class of 2027/);
+  assert.match(home, /AI application &amp; Agent engineering/);
 });
 
 function publicFiles(dir) {

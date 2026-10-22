@@ -1,0 +1,38 @@
+{
+  "url": "http://127.0.0.1:4173/",
+  "browser": "Automated Chromium",
+  "results": [
+    {
+      "width": 1440,
+      "heroActionsVisible": true,
+      "beforePlayVideoRequests": 0,
+      "detailOverflow": 0,
+      "homeOverflow": 0,
+      "pageErrors": []
+    },
+    {
+      "width": 768,
+      "heroActionsVisible": true,
+      "beforePlayVideoRequests": 0,
+      "detailOverflow": 0,
+      "homeOverflow": 0,
+      "pageErrors": []
+    },
+    {
+      "width": 390,
+      "heroActionsVisible": true,
+      "beforePlayVideoRequests": 0,
+      "detailOverflow": 0,
+      "homeOverflow": 0,
+      "pageErrors": []
+    },
+    {
+      "width": 360,
+      "heroActionsVisible": true,
+      "beforePlayVideoRequests": 0,
+      "detailOverflow": 0,
+      "homeOverflow": 0,
+      "pageErrors": []
+    }
+  ]
+}

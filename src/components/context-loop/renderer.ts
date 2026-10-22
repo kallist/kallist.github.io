@@ -19,7 +19,7 @@ function maskStrength(x: number, y: number, masks: MaskRect[]) {
     const dx = Math.max(mask.left - x, 0, x - mask.right);
     const dy = Math.max(mask.top - y, 0, y - mask.bottom);
     const distance = Math.hypot(dx, dy);
-    if (distance < 52) strength = Math.min(strength, .16 + .84 * distance / 52);
+    if (distance < 52) strength = Math.min(strength, .04 + .96 * distance / 52);
   }
   return strength;
 }

@@ -22,6 +22,16 @@ Initial assets were copied on 2026-09-23; the fifth gallery image was supplied o
 
 The source resume PDFs are intentionally excluded from public assets.
 
+## Moving-image archive — 2026-10-22
+
+| Local assets | Origin | Authenticity / display note |
+| --- | --- | --- |
+| `public/films/cueparcel-cinematic.{mp4,webp}` | User-supplied `cueparcel-v4-cinematic-take05.mp4` | Full product film, packet-identical video/audio with faststart container; poster is a documented real frame crop. Product workflow presentation, not measured agent performance. |
+| `public/films/qingming-comparison.{mp4,webp}` | User-supplied `qingming-GPT-left-DeepSeek-right-4k30.mp4` | 1080p web derivative of the 4K side-by-side original; both labels retained. Comparison presentation, not a controlled benchmark or exclusive authorship proof. |
+| `public/films/singularity-study.{mp4,webp}` | User-supplied `echoes_of_the_singularity_sample.mp4` | 48-second web excerpt from source second 12. Unverified festival opening omitted; source-credited Gemini ending retained. No award or festival-selection claim. |
+
+All original files remain unchanged outside the repository. Exact source/output SHA-256 values, commands, crops, sizes, full-decode and faststart validation are recorded in [film asset provenance](FILM_ASSETS.md). Posters load before video; video requests start only on intentional Play. No third-party player, tracking or autoplay-on-entry is introduced.
+
 ## VowEdit addition — 2026-10-07
 
 Both images were downloaded from public VowEdit commit `8bb5c722bd8270b102f51cda9fa7f17b0bd991e4` (merged PR #4). The repository default branch is still `feat/vowedit-v0.1`; commit links deliberately preserve the V0.3 evidence. These are project-owned Mock fixture UI screenshots, not model-generated success examples. The original screenshots retain a V0.2 header; the V0.3 evidence manifest explicitly identifies them as derived V0.3 captures. No UI reconstruction, compositing or content replacement was performed. Only rectangular crops and lossless WebP encoding with Sharp were applied. Original full captures remain accessible in the cited source.

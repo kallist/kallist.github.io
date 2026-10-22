@@ -3,9 +3,9 @@ export type Language = "en" | "zh";
 const en = {
   navButton: "Open chapter navigation", navIndex: "Index", navDialog: "Chapters", navClose: "Close chapter navigation",
   navIntro: "Intro", navWork: "Selected work", navEducation: "Education", navMethod: "Method",
-  navVisual: "Visual practice", navContact: "Contact", navResume: "Resume", navIndependent: "Independent practice / 2026", navEscape: "Close with Esc",
+  navVisual: "Visual practice", navFilms: "Films", navContact: "Contact", navResume: "Resume", navIndependent: "Independent practice / 2026", navEscape: "Close with Esc",
   heroFocus: "AI systems × Visual thinking", heroIntro: "Introduction",
-  heroStatement: "Make the system visible. Make the evidence matter.", heroArt: "FIG 00 / Original ink drawing",
+  heroStatement: "AI systems.", heroEmphasis: "Human control.", heroRole: "AI application & Agent engineering", heroClass: "South China Agricultural University · Class of 2027", heroDescription: "I build tools that make context, execution and human decisions visible.", heroExplore: "Explore work", heroContact: "Contact", heroArt: "Original ink / the hand behind the systems",
   heroFields: "Context / Agents / Evidence / Art", heroScroll: "Scroll to selected work",
   workHeadingA: "Selected", workHeadingB: "work.",
   workIntro: "Five systems. Five different boundaries. Each case keeps its source, decisions and limits one click away.",
@@ -52,9 +52,9 @@ const en = {
 const zh: Record<keyof typeof en, string> = {
   navButton: "打开章节导航", navIndex: "目录", navDialog: "章节", navClose: "关闭章节导航",
   navIntro: "引言", navWork: "精选项目", navEducation: "教育经历", navMethod: "方法与经历",
-  navVisual: "视觉创作", navContact: "联系", navResume: "简历", navIndependent: "独立实践 / 2026", navEscape: "按 Esc 关闭",
+  navVisual: "视觉创作", navFilms: "影像", navContact: "联系", navResume: "简历", navIndependent: "独立实践 / 2026", navEscape: "按 Esc 关闭",
   heroFocus: "AI 系统 × 视觉思考", heroIntro: "引言",
-  heroStatement: "让系统可见，让证据有分量。", heroArt: "图 00 / 原创墨线自画像",
+  heroStatement: "构建 AI 系统，", heroEmphasis: "让人保有掌控。", heroRole: "AI 应用与 Agent 工程", heroClass: "华南农业大学 · 2027届", heroDescription: "把上下文、执行过程和人的决策，做成看得见、可检查的产品。", heroExplore: "浏览项目", heroContact: "联系", heroArt: "原创墨稿 / 系统背后的手绘思考",
   heroFields: "上下文 / 智能体 / 证据 / 视觉", heroScroll: "浏览精选项目",
   workHeadingA: "精选", workHeadingB: "项目。",
   workIntro: "五个系统，五种不同的边界。每个案例都能追溯来源、决策与局限。",

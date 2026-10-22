@@ -9,6 +9,8 @@ import { SectionPattern } from "@/components/section-pattern";
 import { WordHover } from "@/components/word-hover";
 import { AsciiContextLoop } from "@/components/ascii-context-loop";
 import { GalleryRibbon } from "@/components/gallery-ribbon";
+import { WorkIndex } from "@/components/work-index";
+import { ScreeningRoom } from "@/components/screening-room";
 import { projects } from "@/content/projects";
 import { homeCopy, type Language } from "@/content/home-copy";
 
@@ -37,12 +39,13 @@ export default function Home() {
     <section id="hero" className="v2-hero v2-field-host" aria-labelledby="hero-title">
       <SectionPattern kind="hero" />
       <div className="v2-frame">
-        <div className="v2-hero-top v2-meta"><span><WordHover text={copy.navIndependent} /></span><span><WordHover text={copy.heroFocus} /></span></div>
+        <div className="v2-hero-top v2-meta"><span><WordHover text={copy.navIndependent} /></span><a href="#films">{copy.navFilms} / 03 <span aria-hidden="true">↗</span></a></div>
         <div className="v2-hero-grid">
           <div className="v2-hero-name v2-reveal">
-            <span className="v2-index">00 / <WordHover text={copy.heroIntro} /></span>
+            <span className="v2-index">{copy.heroRole}</span>
             <h1 id="hero-title"><WordHover text="kallist" /><span aria-hidden="true">.</span></h1>
-            <div className="v2-hero-statement"><span className="v2-registration" aria-hidden="true">┼</span><p><WordHover text={copy.heroStatement} /></p></div>
+            <div className="v2-hero-statement"><p><WordHover text={copy.heroStatement} /><br/><em><WordHover text={copy.heroEmphasis} /></em></p></div>
+            <div className="v3-hero-summary"><p>{copy.heroDescription}</p><p className="v3-hero-identity">{copy.heroClass}</p><div className="v3-hero-actions"><Link href="#work">{copy.heroExplore}<span aria-hidden="true">↗</span></Link><Link href="/resume/">{copy.navResume}<span aria-hidden="true">↗</span></Link><a href="mailto:2441397782@qq.com">{copy.heroContact}<span aria-hidden="true">↗</span></a></div></div>
           </div>
           <div className="v2-hero-art v2-reveal">
             <img src="/portrait/self-portrait.webp" alt="Black and white hand-drawn manga self portrait for kallist, fragmented with diagonal ink strokes" width="1448" height="1086" fetchPriority="high" />
@@ -56,6 +59,7 @@ export default function Home() {
     <section id="work" className="v2-work" aria-labelledby="work-title">
       <div className="v2-frame"><ChapterMark number="01" title={copy.navWork} />
         <div className="v2-section-intro v2-reveal"><h2 id="work-title"><WordHover text={copy.workHeadingA} />{language === "en" ? " " : null}<em><WordHover text={copy.workHeadingB} /></em></h2><p><WordHover text={copy.workIntro} /></p></div>
+        <WorkIndex language={language} />
       </div>
 
       <article id="vowedit" className="v2-case v2-vow-scene v2-field-host v2-scene" aria-labelledby="vowedit-title">
@@ -76,7 +80,7 @@ export default function Home() {
         </div>
       </article>
 
-      <article className="v2-case v2-repo-scene v2-field-host v2-scene" aria-labelledby="repobound-title">
+      <article id="repobound" className="v2-case v2-repo-scene v2-field-host v2-scene" aria-labelledby="repobound-title">
         <SectionPattern kind="repobound" />
         <div className="v2-scene-guides" aria-hidden="true" />
         <div className="v2-frame v2-repo-layout">
@@ -88,7 +92,7 @@ export default function Home() {
         </div>
       </article>
 
-      <article className="v2-case v2-cue-scene v2-field-host v2-scene" aria-labelledby="cueparcel-title">
+      <article id="cueparcel" className="v2-case v2-cue-scene v2-field-host v2-scene" aria-labelledby="cueparcel-title">
         <SectionPattern kind="cueparcel" />
         <div className="v2-scene-guides" aria-hidden="true" />
         <div className="v2-frame v2-cue-layout">
@@ -100,7 +104,7 @@ export default function Home() {
         </div>
       </article>
 
-      <article className="v2-case v2-agent-scene v2-field-host v2-scene" aria-labelledby="agent-title">
+      <article id="agent-studio" className="v2-case v2-agent-scene v2-field-host v2-scene" aria-labelledby="agent-title">
         <SectionPattern kind="agent" />
         <div className="v2-scene-guides" aria-hidden="true" />
         <div className="v2-frame v2-agent-layout">
@@ -112,7 +116,7 @@ export default function Home() {
         </div>
       </article>
 
-      <article className="v2-case v2-skin-scene v2-field-host v2-scene" aria-labelledby="skin-title">
+      <article id="skin-lesion-ai" className="v2-case v2-skin-scene v2-field-host v2-scene" aria-labelledby="skin-title">
         <SectionPattern kind="skin" />
         <div className="v2-scene-guides" aria-hidden="true" />
         <div className="v2-frame v2-skin-layout">
@@ -125,20 +129,22 @@ export default function Home() {
       </article>
     </section>
 
+    <ScreeningRoom language={language} />
+
     <section id="education" className="v2-education v2-field-host" aria-labelledby="education-title" lang="zh-CN">
       <SectionPattern kind="education" />
       <div className="v2-frame">
-        <div className="v2-education-meta v2-reveal"><span>02 / <WordHover text={copy.educationChapter} /></span><span>2023.09 — 2027.06</span></div>
+        <div className="v2-education-meta v2-reveal"><span>03 / <WordHover text={copy.educationChapter} /></span><span>2023.09 — 2027.06</span></div>
         <div className="v2-education-spread">
           <div className="v2-education-art v2-reveal"><img src="/graphics/scau-gate.svg" alt="由数字与汉字描绘的华南农业大学校门" width="1200" height="700" /><span>{copy.educationFig}</span></div>
-          <div className="v2-education-copy v2-reveal"><span className="v2-registration" aria-hidden="true">┼</span><h2 id="education-title"><WordHover text="华南农业大学" /></h2><p><WordHover text="信息管理与信息系统" /></p><div className="v2-education-data"><span><WordHover text="本科" /></span><span>2023.09 — 2027.06</span><span>2027届</span></div></div>
+          <div className="v2-education-copy v2-reveal"><span className="v2-registration" aria-hidden="true">┼</span><h2 id="education-title"><span className="v3-university-line">华南</span><span className="v3-university-line">农业大学</span></h2><p><WordHover text="信息管理与信息系统" /></p><div className="v2-education-data"><span><WordHover text="本科" /></span><span>2023.09 — 2027.06</span><span>2027届</span></div></div>
         </div>
       </div>
     </section>
 
     <section id="profile" className="v2-method v2-field-host" aria-labelledby="profile-title">
       <SectionPattern kind="method" />
-      <div className="v2-frame"><ChapterMark number="03" title={copy.methodChapter} />
+      <div className="v2-frame"><ChapterMark number="04" title={copy.methodChapter} />
         <div className="v2-method-grid">
           <div className="v2-reveal"><h2 id="profile-title"><WordHover text={copy.methodHeadingA} /><br/><em><WordHover text={copy.methodHeadingB} /></em></h2><p className="v2-method-intro"><WordHover text={copy.methodIntro} /></p></div>
           <div className="v2-principles v2-reveal">{[
@@ -160,7 +166,7 @@ export default function Home() {
 
     <section id="visual" className="v2-visual v2-field-host" aria-labelledby="visual-title">
       <SectionPattern kind="visual" />
-      <div className="v2-frame"><ChapterMark number="04" title={copy.navVisual} />
+      <div className="v2-frame"><ChapterMark number="05" title={copy.navVisual} />
         <div className="v2-visual-heading v2-reveal"><h2 id="visual-title"><WordHover text={copy.visualHeadingA} />{language === "en" ? " " : null}<em><WordHover text={copy.visualHeadingB} /></em></h2><p><WordHover text={copy.visualIntro} /></p></div>
       </div>
       <GalleryRibbon language={language} />
@@ -168,7 +174,7 @@ export default function Home() {
 
     <section id="contact" className="v2-contact v2-field-host" aria-labelledby="contact-title">
       <SectionPattern kind="contact" />
-      <div className="v2-frame"><ChapterMark number="05" title={copy.navContact} />
+      <div className="v2-frame"><ChapterMark number="06" title={copy.navContact} />
         <div className="v2-contact-body v2-reveal"><p><WordHover text={copy.contactStatement} /></p><h2 id="contact-title"><WordHover text="kallist" /><span aria-hidden="true">.</span></h2><div className="v2-contact-links"><a href="mailto:2441397782@qq.com"><WordHover text="2441397782@qq.com" /> <span aria-hidden="true">↗</span></a><a href="https://github.com/kallist" target="_blank" rel="noopener noreferrer"><WordHover text={copy.contactGitHub} /> <span aria-hidden="true">↗</span></a><Link href="/resume/"><WordHover text={copy.contactResume} /> <span aria-hidden="true">↗</span></Link></div></div>
         <div className="v2-contact-bottom"><span>{copy.contactBottom}</span><Link href="#hero">{copy.contactReturn} ↑</Link></div>
       </div>
