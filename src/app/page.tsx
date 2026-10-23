@@ -11,6 +11,7 @@ import { AsciiContextLoop } from "@/components/ascii-context-loop";
 import { GalleryRibbon } from "@/components/gallery-ribbon";
 import { WorkIndex } from "@/components/work-index";
 import { ScreeningRoom } from "@/components/screening-room";
+import { ContextTheatre, TheatreBand } from "@/components/context-theatre";
 import { projects } from "@/content/projects";
 import { homeCopy, type Language } from "@/content/home-copy";
 
@@ -34,6 +35,7 @@ export default function Home() {
   return <main id="main" className="v2-home" lang={language === "zh" ? "zh-CN" : "en"}>
     <ChapterNavigation language={language} onLanguageChange={setLanguage} />
     <RevealObserver />
+    <ContextTheatre language={language} />
     <AsciiContextLoop />
 
     <section id="hero" className="v2-hero v2-field-host" aria-labelledby="hero-title">
@@ -47,15 +49,19 @@ export default function Home() {
             <div className="v2-hero-statement"><p><WordHover text={copy.heroStatement} /><br/><em><WordHover text={copy.heroEmphasis} /></em></p></div>
             <div className="v3-hero-summary"><p>{copy.heroDescription}</p><p className="v3-hero-identity">{copy.heroClass}</p><div className="v3-hero-actions"><Link href="#work">{copy.heroExplore}<span aria-hidden="true">↗</span></Link><Link href="/resume/">{copy.navResume}<span aria-hidden="true">↗</span></Link><a href="mailto:2441397782@qq.com">{copy.heroContact}<span aria-hidden="true">↗</span></a></div></div>
           </div>
-          <div className="v2-hero-art v2-reveal">
-            <img src="/portrait/self-portrait.webp" alt="Black and white hand-drawn manga self portrait for kallist, fragmented with diagonal ink strokes" width="1448" height="1086" fetchPriority="high" />
-            <span className="v2-art-label">{copy.heroArt}</span>
+          <div className="v4-aperture" aria-hidden="true">
+            <div className="v4-spatial-grid" />
+            <span className="v4-object-index">FIG. 00 / CONTEXT IN CONTINUUM</span>
+            <span className="v4-object-axis">INPUT → CONTEXT → ACTION → TRACE</span>
+            <span className="v4-object-caption">ONE SURFACE.<br/>INFINITE CONTEXT.</span>
+            <i className="v4-registration v4-registration--a" /><i className="v4-registration v4-registration--b" />
           </div>
         </div>
         <div className="v2-hero-bottom v2-meta"><span><WordHover text={copy.heroFields} /></span><Link href="#work"><WordHover text={copy.heroScroll} /> <span aria-hidden="true">↓</span></Link></div>
       </div>
     </section>
 
+    <TheatreBand variant="work" />
     <section id="work" className="v2-work" aria-labelledby="work-title">
       <div className="v2-frame"><ChapterMark number="01" title={copy.navWork} />
         <div className="v2-section-intro v2-reveal"><h2 id="work-title"><WordHover text={copy.workHeadingA} />{language === "en" ? " " : null}<em><WordHover text={copy.workHeadingB} /></em></h2><p><WordHover text={copy.workIntro} /></p></div>
@@ -129,6 +135,7 @@ export default function Home() {
       </article>
     </section>
 
+    <TheatreBand variant="film" />
     <ScreeningRoom language={language} />
 
     <section id="education" className="v2-education v2-field-host" aria-labelledby="education-title" lang="zh-CN">

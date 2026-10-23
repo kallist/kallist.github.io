@@ -5,6 +5,7 @@ import "./globals.css";
 import "./v11.css";
 import "./v2.css";
 import "./cinematic.css";
+import "./theatre.css";
 
 const siteUrl = "https://kallist.github.io";
 

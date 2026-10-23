@@ -2,7 +2,7 @@ import { flowPosition, surfacePoint, type LoopModel, type SurfacePoint } from ".
 
 type Point = { x: number; y: number };
 export type MaskRect = { left: number; right: number; top: number; bottom: number };
-export type LoopEnvironment = { dark: boolean; strength: number; masks: MaskRect[] };
+export type LoopEnvironment = { dark: boolean; strength: number; masks: MaskRect[]; theatre?: number };
 
 export type LoopRenderer = {
   resize: (width: number, height: number, dpr: number) => void;
@@ -76,11 +76,32 @@ export function createLoopRenderer(canvas: HTMLCanvasElement, model: LoopModel):
       }
 
       const isMobile = width < 700;
-      const spanX = width * (isMobile ? .92 : .94);
-      const spanY = height * (isMobile ? .63 : 1.13);
-      const originX = width * .49;
-      const originY = height * (isMobile ? .27 : .48);
+      const camera = environment.theatre ?? 0;
+      const spanX = width * ((isMobile ? .92 : .94) - camera * (isMobile ? .12 : .30));
+      const spanY = height * ((isMobile ? .63 : 1.13) - camera * (isMobile ? .36 : .36));
+      const originX = width * (.49 + camera * (isMobile ? 0 : .20));
+      const originY = height * ((isMobile ? .27 : .48) + camera * (isMobile ? .30 : -.12));
+      const yaw = reducedMotion ? 0 : camera * (.13 * Math.sin(seconds * .19) + (pointerX / width - .5) * pointerWeight * .16);
+      const pitch = reducedMotion ? 0 : camera * .09 * Math.sin(seconds * .23);
+      const cosYaw = Math.cos(yaw), sinYaw = Math.sin(yaw), cosPitch = Math.cos(pitch), sinPitch = Math.sin(pitch);
       const ink = environment.dark ? "#e6e1d7" : "#282722";
+      // The opening's contour ribbons share the glyph surface and camera.
+      // They are projected structural lines, not a separate orbit/spinner.
+      if (camera > .01) {
+        ctx.strokeStyle = environment.dark ? "#b8c0aa" : "#555e4a";
+        ctx.lineWidth = .6;
+        for (let lane = -1; lane <= 1.01; lane += .2) {
+          ctx.globalAlpha = (.12 + Math.abs(lane) * .12) * camera;
+          ctx.beginPath();
+          for (let step = 0; step <= 160; step++) {
+            const point = surfacePoint(step / 160 * Math.PI * 2, lane, reducedMotion ? 0 : seconds, reducedMotion, semanticAhead);
+            const x = originX + ((point.x - .5) * cosYaw + point.z * sinYaw) * spanX;
+            const y = originY + ((point.y - .5) * cosPitch - point.z * sinPitch) * spanY;
+            if (step === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        }
+      }
       ctx.fillStyle = ink;
       for (let bucket = 0; bucket < depthBuckets; bucket++) {
         const depth = bucket / (depthBuckets - 1);
@@ -89,8 +110,8 @@ export function createLoopRenderer(canvas: HTMLCanvasElement, model: LoopModel):
         for (const index of buckets[bucket]) {
           const glyph = model.glyphs[index];
           const point = points[index];
-          let x = originX + (point.x - .5) * spanX;
-          let y = originY + (point.y - .5) * spanY;
+          let x = originX + ((point.x - .5) * cosYaw + point.z * sinYaw) * spanX;
+          let y = originY + ((point.y - .5) * cosPitch - point.z * sinPitch) * spanY;
           const local = reducedMotion ? 0 : Math.sin(seconds * .48 + glyph.phase) * .55;
           x += local;
           y += local * .5;
