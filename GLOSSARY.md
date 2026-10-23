@@ -4,6 +4,10 @@ This portfolio connects inspectable engineering work with visual practice. Its l
 
 ## Language
 
+**Context Theatre**:
+The portfolio's moving opening, presenting context as a continuous surface that leads into inspectable engineering work.
+_Avoid_: Loading screen, model demonstration, product benchmark
+
 **Case study**:
 A source-backed account of a project's problem, engineering decisions, delivered workflow and limits.
 _Avoid_: Product advertisement, verified business outcome

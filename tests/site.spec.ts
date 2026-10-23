@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test("homepage presents the real portrait and five ordered, reachable cases", async ({
+test("homepage presents a drawn context theatre and five ordered, reachable cases", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -8,15 +8,12 @@ test("homepage presents the real portrait and five ordered, reachable cases", as
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("kallist.");
   await expect(page.locator(".brand")).toHaveText("kallist");
   await expect(page.locator("main")).not.toContainText(/Wei Zhuojie|韦焯杰/);
-  const portrait = page
-    .getByRole("img", { name: /self portrait for kallist/i })
-    .first();
-  await expect(portrait).toBeVisible();
-  expect(
-    await portrait.evaluate(
-      (image: HTMLImageElement) => image.complete && image.naturalWidth > 0,
-    ),
-  ).toBe(true);
+  await expect(page.locator("#hero img")).toHaveCount(0);
+  await expect(page.locator("#hero .v4-aperture")).toBeVisible();
+  await expect.poll(() => page.locator("[data-living-ascii-loop]").evaluate((canvas: HTMLCanvasElement) => {
+    const pixels = canvas.getContext("2d")!.getImageData(0, 0, canvas.width, canvas.height).data;
+    return pixels.some((value, index) => index % 4 === 3 && value > 0);
+  })).toBe(true);
   await expect(page.locator(".v2-work article h3")).toHaveText([
     /VowEdit/,
     /RepoBound/,
@@ -117,6 +114,14 @@ test("body words and display text have hover feedback, and homepage images load"
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   const word = page.locator(".v2-hero-statement .v2-word").first();
+  // Hover the settled glyph after its real, finite entrance animation. Moving
+  // type can otherwise leave the pointer between the hover and its assertion.
+  await word.evaluate(async node => {
+    const entrances = node.getAnimations().filter(animation =>
+      Number.isFinite(animation.effect?.getComputedTiming().endTime ?? Infinity),
+    );
+    await Promise.all(entrances.map(animation => animation.finished));
+  });
   await word.hover();
   await expect.poll(() => word.evaluate((node) => getComputedStyle(node).backgroundSize)).toBe("100% 100%");
   const headingWord = page.locator("#work-title .v2-word").first();
@@ -125,7 +130,7 @@ test("body words and display text have hover feedback, and homepage images load"
   await expect.poll(() => page.locator(".v2-section-intro").evaluate((node) => getComputedStyle(node).transform)).toBe("none");
   await headingWord.hover();
   await expect.poll(() => headingWord.evaluate((node) => getComputedStyle(node).backgroundSize)).toBe("100% 100%");
-  for (const image of await page.locator(".v2-case-media img, .v2-hero-art img, .v2-education-art img").all()) {
+  for (const image of await page.locator(".v2-case-media img, .v2-education-art img").all()) {
     await image.scrollIntoViewIfNeeded();
     await expect.poll(() => image.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0)).toBe(true);
   }
@@ -330,15 +335,7 @@ test("ASCII context loop stays behind readable content and becomes static in red
   expect(await livingCanvas.evaluate((node: HTMLCanvasElement) => node.toDataURL())).not.toBe(continuingFrame);
   expect(await loop.evaluate((node) => getComputedStyle(node).position)).toBe("fixed");
   expect(await loop.evaluate((node) => getComputedStyle(node).pointerEvents)).toBe("none");
-  const portrait = page.locator(".v2-hero-art img");
-  await expect.poll(() => portrait.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0)).toBe(true);
-  const portraitBox = await portrait.boundingBox();
-  if (!portraitBox) throw new Error("Hero portrait has no bounds");
-  const portraitInterior = { x: portraitBox.x + 2, y: portraitBox.y + 2, width: portraitBox.width - 4, height: portraitBox.height - 4 };
-  const portraitWithLoop = await page.screenshot({ clip: portraitInterior, animations: "disabled" });
-  await loop.evaluate((node: HTMLElement) => { node.style.visibility = "hidden"; });
-  expect(portraitWithLoop.equals(await page.screenshot({ clip: portraitInterior, animations: "disabled" }))).toBe(true);
-  await loop.evaluate((node: HTMLElement) => { node.style.visibility = "visible"; });
+  await expect(page.locator("#hero img")).toHaveCount(0);
   await page.locator("#work").scrollIntoViewIfNeeded();
   await expect(page.getByRole("link", { name: /Explore case study/i }).first()).toBeVisible();
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -383,7 +380,7 @@ test("hero no longer waits for a loop intro and the loop remains fixed through t
       return original.apply(this, args);
     };
     document.addEventListener("animationstart", (event) => {
-      if (!timeline.heroStart && event.target instanceof Element && event.target.matches(".v2-hero .v2-frame")) timeline.heroStart = performance.now();
+      if (!timeline.heroStart && event.target instanceof Element && event.target.matches(".v2-hero h1 .v2-word")) timeline.heroStart = performance.now();
     });
   });
   await page.goto("/", { waitUntil: "domcontentloaded" });
@@ -396,7 +393,7 @@ test("hero no longer waits for a loop intro and the loop remains fixed through t
   // The recruitment path must arrive without waiting for the decorative loop.
   expect(timeline.heroStart).toBeGreaterThan(0);
   expect(timeline.heroStart - timeline.firstGlyph).toBeLessThan(1000);
-  expect(await hero.evaluate(node => Number.parseFloat(getComputedStyle(node).animationDelay))).toBeLessThanOrEqual(.25);
+  expect(await page.locator(".v2-hero h1 .v2-word").evaluate(node => Number.parseFloat(getComputedStyle(node).animationDelay))).toBeLessThanOrEqual(.25);
   await expect(page.locator(".v3-hero-actions").getByRole("link", { name: /^Resume/ })).toBeInViewport();
   await page.locator("#contact").scrollIntoViewIfNeeded();
   await expect(loop).toBeInViewport();
@@ -632,8 +629,8 @@ test("reduced motion keeps content visible and disables smooth scrolling", async
     ),
   ).toBe("auto");
   expect(
-    await page.locator(".v2-hero-art").evaluate((node) => getComputedStyle(node).transitionDuration),
-  ).toBe("1e-05s");
+    await page.locator(".v4-spatial-grid").evaluate((node) => getComputedStyle(node).animationName),
+  ).toBe("none");
 });
 
 test("desktop chapter navigation keeps work, method, art and resume reachable", async ({

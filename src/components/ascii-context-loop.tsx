@@ -17,6 +17,7 @@ export function AsciiContextLoop() {
     const host = hostRef.current;
     if (!canvas || !host) return;
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const still = () => motion.matches || document.documentElement.dataset.ambientPaused === "true";
     const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
     let detail = detailForWidth(window.innerWidth);
     let model = createLoopModel(seed, detail);
@@ -40,11 +41,11 @@ export function AsciiContextLoop() {
       ["#films", "films", true, .22],
       [".v2-cue-scene", "cue", true, .48],
       ["#education", "education", true, .30],
-      ["#contact", "contact", true, .58],
-      ["#visual", "visual", false, .53],
-      ["#profile", "profile", false, .34],
-      ["#work", "work", false, .42],
-      ["#hero", "hero", false, .58],
+      ["#contact", "contact", true, .30],
+      ["#visual", "visual", false, .30],
+      ["#profile", "profile", false, .20],
+      ["#work", "work", false, .25],
+      ["#hero", "hero", true, .96],
     ] as const;
     const chapterNodes = chapters.map(([selector, zone, dark, strength]) => ({
       element: document.querySelector(selector), zone, dark, strength,
@@ -67,8 +68,11 @@ export function AsciiContextLoop() {
         return rect.top <= middleY && rect.bottom >= middleY;
       });
       const zone = current?.zone ?? "hero";
-      const environment: LoopEnvironment = { dark: current?.dark ?? false, strength: current?.strength ?? 1, masks: [] };
-      if (motion.matches || introMasksApplied) {
+      const hero = document.querySelector("#hero")?.getBoundingClientRect();
+      const theatre = zone === "hero" ? Math.max(0, Math.min(1, 1 + (hero?.top ?? 0) / (hero?.height || 1))) : 0;
+      const environment: LoopEnvironment = { dark: current?.dark ?? false, strength: current?.strength ?? 1, masks: [], theatre };
+      host.dataset.theatreCamera = theatre.toFixed(3);
+      if (still() || introMasksApplied) {
         for (const node of maskNodes) {
           const rect = node.getBoundingClientRect();
           if (rect.bottom < -52 || rect.top > window.innerHeight + 52) continue;
@@ -79,7 +83,7 @@ export function AsciiContextLoop() {
       renderer?.setEnvironment(environment);
       host.dataset.loopPalette = environment.dark ? "light" : "dark";
       host.dataset.loopZone = zone;
-      if (motion.matches && (zone !== previousZone || environment.masks.length)) renderer?.draw(10, true);
+      if (still() && (zone !== previousZone || environment.masks.length)) renderer?.draw(10, true);
       previousZone = zone;
     };
     const scheduleEnvironment = () => {
@@ -100,10 +104,10 @@ export function AsciiContextLoop() {
       }
       renderer?.resize(width, window.innerHeight, window.devicePixelRatio || 1);
       updateEnvironment();
-      if (motion.matches) renderer?.draw(10, true);
+      if (still()) renderer?.draw(10, true);
     };
     const tick = (now: number) => {
-      if (disposed || motion.matches || document.visibilityState === "hidden") return;
+      if (disposed || still() || document.visibilityState === "hidden") return;
       if (previousTime) elapsed += Math.min((now - previousTime) / 1000, .1);
       previousTime = now;
       const minimumInterval = detail < 1 ? 62 : 58;
@@ -133,7 +137,7 @@ export function AsciiContextLoop() {
         host.dataset.loopMotion = "paused";
         return;
       }
-      if (motion.matches) {
+      if (still()) {
         host.dataset.loopMotion = "static";
         host.dataset.loopPhase = "ready";
         renderer?.setPointer(null);
@@ -144,7 +148,7 @@ export function AsciiContextLoop() {
       frame = requestAnimationFrame(tick);
     };
     const onPointerMove = (event: PointerEvent) => {
-      if (motion.matches || !finePointer.matches || event.pointerType === "touch") return;
+      if (still() || !finePointer.matches || event.pointerType === "touch") return;
       renderer?.setPointer({ x: event.clientX, y: event.clientY });
     };
     const onPointerLeave = () => renderer?.setPointer(null);
@@ -162,13 +166,15 @@ export function AsciiContextLoop() {
     window.addEventListener("pointerleave", onPointerLeave);
     document.addEventListener("visibilitychange", start);
     motion.addEventListener("change", start);
+    const onMotionChange = () => { start(); updateEnvironment(); };
+    window.addEventListener("portfolio-motion-change", onMotionChange);
     finePointer.addEventListener("change", onPointerLeave);
     // Some engines update MediaQueryList.matches without delivering its change
     // event during an emulated or OS-level preference transition.
     const preferenceCheck = window.setInterval(() => {
       if (document.visibilityState === "hidden") return;
-      if ((motion.matches && host.dataset.loopMotion !== "static")
-        || (!motion.matches && host.dataset.loopMotion === "static")) {
+      if ((still() && host.dataset.loopMotion !== "static")
+        || (!still() && host.dataset.loopMotion === "static")) {
         start();
         updateEnvironment();
       }
@@ -184,6 +190,7 @@ export function AsciiContextLoop() {
       window.removeEventListener("pointerleave", onPointerLeave);
       document.removeEventListener("visibilitychange", start);
       motion.removeEventListener("change", start);
+      window.removeEventListener("portfolio-motion-change", onMotionChange);
       finePointer.removeEventListener("change", onPointerLeave);
     };
   }, []);

@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
 
 const url = "http://127.0.0.1:4173/";
-const folder = process.env.QA_ROUND === "draft" ? "../.qa/cinematic-draft/" : "../docs/visual-qa/cinematic/";
+const folder = process.env.QA_VARIANT === "theatre" ? "../docs/visual-qa/theatre/" : process.env.QA_ROUND === "draft" ? "../.qa/cinematic-draft/" : "../docs/visual-qa/cinematic/";
 const dir = new URL(folder, import.meta.url);
 await mkdir(dir, { recursive: true });
 let server;

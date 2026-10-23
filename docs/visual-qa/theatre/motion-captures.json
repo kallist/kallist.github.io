@@ -1,0 +1,43 @@
+{
+  "browser": "Automated Chromium",
+  "motion": "no-preference",
+  "frames": [
+    {
+      "file": "entry-1.webp",
+      "elapsedSinceNavigation": 1263
+    },
+    {
+      "file": "entry-2.webp",
+      "elapsedSinceNavigation": 2003
+    },
+    {
+      "file": "entry-3.webp",
+      "elapsedSinceNavigation": 3179
+    },
+    {
+      "file": "entry-4.webp",
+      "elapsedSinceNavigation": 4688
+    },
+    {
+      "file": "pointer-perspective.webp",
+      "elapsedSinceNavigation": 5764
+    },
+    {
+      "file": "work-band-motion.webp",
+      "elapsedSinceNavigation": 7571
+    },
+    {
+      "file": "film-band-motion.webp",
+      "elapsedSinceNavigation": 15033
+    },
+    {
+      "file": "ending-motion.webp",
+      "elapsedSinceNavigation": 21478
+    },
+    {
+      "file": "paused-opening.webp",
+      "elapsedSinceNavigation": 22281
+    }
+  ],
+  "note": "Real-time browser recording and discrete captures; timings include capture overhead, not controlled benchmark frames."
+}
